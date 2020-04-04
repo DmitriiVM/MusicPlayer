@@ -67,12 +67,14 @@ MediaBrowserHelperCallback{
     override fun onPlaybackStateChanged(state: PlaybackStateCompat) {
         when (state.state) {
             PlaybackStateCompat.STATE_PLAYING -> {
+                Log.d("mmm", "MainActivity :  onPlaybackStateChanged --  STATE_PLAYING")
                 imageViewPlayPause.setImageResource(R.drawable.ic_pause_black_24dp)
                 imageViewPlayPause.setOnClickListener {
                     mediaBrowserHelper.getTransportControls().pause()
                 }
             }
             PlaybackStateCompat.STATE_PAUSED -> {
+                Log.d("mmm", "MainActivity :  onPlaybackStateChanged -- STATE_PAUSED ")
                 imageViewPlayPause.setImageResource(R.drawable.ic_play_arrow_black_24dp)
                 imageViewPlayPause.setOnClickListener {
                     mediaBrowserHelper.getTransportControls().play()

@@ -2,44 +2,34 @@ package com.example.musicplayer
 
 import android.annotation.SuppressLint
 import android.app.Notification
-import android.content.Context
-import android.support.v4.media.MediaMetadataCompat
-import android.support.v4.media.session.PlaybackStateCompat
-import com.google.android.exoplayer2.source.ProgressiveMediaSource
-import com.google.android.exoplayer2.trackselection.DefaultTrackSelector
-import com.google.android.exoplayer2.upstream.DefaultDataSourceFactory
-import com.google.android.exoplayer2.util.Util
-import com.google.android.exoplayer2.audio.AudioAttributes
-import com.google.android.exoplayer2.ui.PlayerNotificationManager
 import android.app.PendingIntent
 import android.app.Service
+import android.content.Context
 import android.content.Intent
 import android.graphics.Bitmap
-import android.os.Handler
 import android.os.SystemClock
-import android.util.Log
-import androidx.core.app.ServiceCompat.stopForeground
+import android.support.v4.media.MediaMetadataCompat
+import android.support.v4.media.session.PlaybackStateCompat
 import androidx.core.content.ContextCompat
-import com.google.android.exoplayer2.*
-import com.google.android.exoplayer2.offline.DownloadService.startForeground
+import com.google.android.exoplayer2.ExoPlayerFactory
+import com.google.android.exoplayer2.Player
+import com.google.android.exoplayer2.SimpleExoPlayer
+import com.google.android.exoplayer2.audio.AudioAttributes
 import com.google.android.exoplayer2.source.ConcatenatingMediaSource
+import com.google.android.exoplayer2.source.ProgressiveMediaSource
 import com.google.android.exoplayer2.source.TrackGroupArray
 import com.google.android.exoplayer2.trackselection.TrackSelectionArray
+import com.google.android.exoplayer2.ui.PlayerNotificationManager
+import com.google.android.exoplayer2.upstream.DefaultDataSourceFactory
 import com.google.android.exoplayer2.upstream.RawResourceDataSource
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.launch
-
-private const val PLAYBACK_CHANNEL_ID = "playback_channel"
-private const val NOTIFICATION_ID = 555
+import com.google.android.exoplayer2.util.Util
+import kotlinx.coroutines.*
 
 class MusicPlayer(private val service: Service) {
 
     private lateinit var exoPlayer: SimpleExoPlayer
     private var playList = listOf<MediaMetadataCompat>()
     private var playbackInfoListener: PlaybackInfoListener? = null
-
 
     fun initializePlayer(
         context: Context,
@@ -49,11 +39,7 @@ class MusicPlayer(private val service: Service) {
         this.playbackInfoListener = playbackInfoListener
         this.playList = playList
 
-        exoPlayer = ExoPlayerFactory.newSimpleInstance(
-            context,
-            DefaultTrackSelector(),
-            DefaultLoadControl()
-        )  // ???
+        exoPlayer = ExoPlayerFactory.newSimpleInstance(context)
         exoPlayer.setAudioAttributes(AudioAttributes.DEFAULT, true)
 
         val notificationManager = buildNotificationManager(context)
@@ -120,15 +106,17 @@ class MusicPlayer(private val service: Service) {
 
         CoroutineScope(Dispatchers.IO).launch {// отписаться
 
-            while (exoPlayer.isPlaying) {
-                playbackInfoListener?.onProgressChanged(
-                    exoPlayer.contentPosition
-                )
+            while (true) {
+                withContext(Dispatchers.Main){
+                    if (!exoPlayer.isPlaying) this.cancel()
+                    playbackInfoListener?.onProgressChanged(
+                        exoPlayer.contentPosition
+                    )
+                }
                 delay(200)
             }
         }
     }
-
 
     @SuppressLint("WrongConstant")
     private fun setState(state: Int) {
@@ -146,6 +134,7 @@ class MusicPlayer(private val service: Service) {
             trackSelections: TrackSelectionArray
         ) {
             updateMediaMetadata()
+            playbackInfoListener?.onProgressChanged(0)
         }
 
         override fun onPlayerStateChanged(playWhenReady: Boolean, playbackState: Int) {
@@ -164,6 +153,7 @@ class MusicPlayer(private val service: Service) {
 
         override fun onLoadingChanged(isLoading: Boolean) {
             updateMediaMetadata()
+            if (exoPlayer.playWhenReady) return
             setState(PlaybackStateCompat.STATE_PAUSED)
         }
     }
@@ -233,6 +223,11 @@ class MusicPlayer(private val service: Service) {
                 service.stopForeground(false)
             }
         }
+    }
+
+    companion object {
+        private const val PLAYBACK_CHANNEL_ID = "playback_channel"
+        private const val NOTIFICATION_ID = 555
     }
 }
 
