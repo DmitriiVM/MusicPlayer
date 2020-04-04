@@ -1,3 +1,9 @@
 <resources>
     <string name="app_name">MusicPlayer</string>
+
+
+    <string name="temp">555</string>
+    <integer name="tempInt">777</integer>
+
+    <string name="playback_channel_name">Now Playing</string>
 </resources>
