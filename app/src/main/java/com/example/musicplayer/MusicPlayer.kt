@@ -36,8 +36,6 @@ class MusicPlayer(private val service: MediaBrowserServiceCompat) {
     private lateinit var exoPlayer: SimpleExoPlayer
     private var playList = listOf<MediaMetadataCompat>()
     private var playbackInfoListener: PlaybackInfoListener? = null
-    private lateinit var becomingNoisyReceiver: BecomingNoisyReceiver
-
 
     fun initializePlayer(
         context: Context,
@@ -56,10 +54,6 @@ class MusicPlayer(private val service: MediaBrowserServiceCompat) {
 
         val concatenatingMediaSource = buildMediaSource(context, playList)
         exoPlayer.prepare(concatenatingMediaSource, false, false)
-
-        service.sessionToken?.let {
-            becomingNoisyReceiver = BecomingNoisyReceiver(context, it)
-        }
     }
 
     private fun buildMediaSource(
@@ -155,10 +149,8 @@ class MusicPlayer(private val service: MediaBrowserServiceCompat) {
                     if (playWhenReady) {
                         setState(PlaybackStateCompat.STATE_PLAYING)
                         startTrackingPlayback()
-                        becomingNoisyReceiver.register()
                     } else {
                         setState(PlaybackStateCompat.STATE_PAUSED)
-                        becomingNoisyReceiver.unregister()
                     }
                 }
             }
@@ -243,37 +235,6 @@ class MusicPlayer(private val service: MediaBrowserServiceCompat) {
         private const val PLAYBACK_CHANNEL_ID = "playback_channel"
         private const val NOTIFICATION_ID = 555
     }
-}
-
-class BecomingNoisyReceiver(
-    private val context: Context,
-    sessionToken: MediaSessionCompat.Token
-) : BroadcastReceiver() {
-
-    private val noisyIntentFilter = IntentFilter(AudioManager.ACTION_AUDIO_BECOMING_NOISY)
-    private val controller = MediaControllerCompat(context, sessionToken)
-    private var registered = false
-
-    fun register(){
-        if (!registered){
-            context.registerReceiver(this, noisyIntentFilter)
-            registered = true
-        }
-    }
-
-    fun unregister(){
-        if (registered){
-            context.unregisterReceiver(this)
-            registered = false
-        }
-    }
-
-    override fun onReceive(context: Context?, intent: Intent?) {
-        if (intent?.action == AudioManager.ACTION_AUDIO_BECOMING_NOISY){
-            controller.transportControls.pause()
-        }
-    }
-
 }
 
 
