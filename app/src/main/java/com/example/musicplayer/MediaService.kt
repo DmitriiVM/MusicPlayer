@@ -117,17 +117,11 @@ class MediaService : MediaBrowserServiceCompat() {
 
     private val playbackInfoListener = object : PlaybackInfoListener {
         override fun onPlaybackStateChange(state: PlaybackStateCompat) {
-//            Log.d("mmm", "MediaService :  onPlaybackStateChange -- $state ")
             mediaSession?.setPlaybackState(state)
         }
 
         override fun onProgressChanged(progress: Long) {
             mediaSession?.sendSessionEvent(progress.toString(), null)
-        }
-
-        override fun onPlaybackComplete() {
-//            Log.d("mmm", "MediaService :  onPlaybackComplete --  ")
-//            mediaSession?.controller?.transportControls?.skipToNext()
         }
 
         override fun updateMediaMetadata(
@@ -137,10 +131,6 @@ class MediaService : MediaBrowserServiceCompat() {
             mediaSession?.setMetadata(mediaMetadata)
             mediaSession?.setQueueTitle(nextSongInfo)
         }
-
-
-
-
     }
 
 }

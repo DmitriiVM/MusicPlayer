@@ -21,6 +21,10 @@ import com.google.android.exoplayer2.source.ConcatenatingMediaSource
 import com.google.android.exoplayer2.source.TrackGroupArray
 import com.google.android.exoplayer2.trackselection.TrackSelectionArray
 import com.google.android.exoplayer2.upstream.RawResourceDataSource
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 
 private const val PLAYBACK_CHANNEL_ID = "playback_channel"
 
@@ -52,8 +56,6 @@ object MusicPlayer {
 
         val concatenatingMediaSource = buildMediaSource(context, playList)
         exoPlayer.prepare(concatenatingMediaSource, false, false)
-
-        Log.d("mmm", "MusicPlayer :  initializePlayer --  ")
     }
 
     private fun buildMediaSource(
@@ -87,7 +89,7 @@ object MusicPlayer {
 
     fun play() {
         exoPlayer.playWhenReady = true
-        startTrackingPlayback()
+//        startTrackingPlayback()
     }
 
     fun pause() {
@@ -104,32 +106,20 @@ object MusicPlayer {
 
 
     fun releasePlayer() {
-        val playbackPosition = exoPlayer.currentPosition
 //        playerNotificationManager.setPlayer(null)
         exoPlayer.release()
     }
 
-
-    private fun isPlaying() = exoPlayer.playWhenReady
-
     private fun startTrackingPlayback() {
 
-
-        val handler = Handler()
-        val runnable = object : Runnable {
-            override fun run() {
-                if (isPlaying()) {
-                    playbackInfoListener?.onProgressChanged(
-                        exoPlayer.contentPosition
-                    )
-                    handler.postDelayed(this, 100)
-                }
-                if (exoPlayer.getContentPosition() >= exoPlayer.getDuration() && exoPlayer.getDuration() > 0) {
-                    playbackInfoListener?.onPlaybackComplete()
-                }
+        CoroutineScope(Dispatchers.IO).launch {// отписаться
+            while (exoPlayer.isPlaying) {
+                playbackInfoListener?.onProgressChanged(
+                    exoPlayer.contentPosition
+                )
+                delay(200)
             }
         }
-        handler.postDelayed(runnable, 100)
     }
 
 
@@ -144,11 +134,6 @@ object MusicPlayer {
 
     private val exoPlayerEventListener = object : Player.EventListener {
 
-
-        override fun onSeekProcessed() {
-//            Log.d("mmm", "DescriptionAdapter :  onSeekProcessed --  ")
-        }
-
         override fun onTracksChanged(
             trackGroups: TrackGroupArray,
             trackSelections: TrackSelectionArray
@@ -156,11 +141,12 @@ object MusicPlayer {
             updateMediaMetadata()
         }
 
-        override fun onPlayerStateChanged(playWhenReady: Boolean, playbackState: Int)  {
+        override fun onPlayerStateChanged(playWhenReady: Boolean, playbackState: Int) {
             when (playbackState) {
                 Player.STATE_READY -> {
                     if (playWhenReady) {
                         setState(PlaybackStateCompat.STATE_PLAYING)
+                        startTrackingPlayback()
                     } else {
                         setState(PlaybackStateCompat.STATE_PAUSED)
                     }

@@ -81,8 +81,4 @@ MediaBrowserHelperCallback{
         }
     }
 
-    override fun onMediaControllerConnected(mediaController: MediaControllerCompat) {
-//        Log.d("mmm", "MainActivity :  onMediaControllerConnected --  $mediaController")
-    }
-
 }

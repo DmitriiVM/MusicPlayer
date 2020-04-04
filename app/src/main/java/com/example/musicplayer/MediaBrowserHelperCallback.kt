@@ -1,7 +1,6 @@
 package com.example.musicplayer
 
 import android.support.v4.media.MediaMetadataCompat
-import android.support.v4.media.session.MediaControllerCompat
 import android.support.v4.media.session.PlaybackStateCompat
 
 interface MediaBrowserHelperCallback {
@@ -13,13 +12,4 @@ interface MediaBrowserHelperCallback {
     fun onQueueTitleChanged(title: CharSequence?)
 
     fun onProgressChanged(progress : Int)
-
-
-
-
-
-    fun onMediaControllerConnected(mediaController: MediaControllerCompat)
-
-
-
 }

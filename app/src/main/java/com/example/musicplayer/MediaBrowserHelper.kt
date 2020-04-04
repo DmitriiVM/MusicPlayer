@@ -108,11 +108,6 @@ class MediaBrowserHelper(
         return mediaController!!.transportControls
     }
 
-
-
-
-
-
     private val mediaControllerCallback = object : MediaControllerCompat.Callback() {
 
         override fun onPlaybackStateChanged(state: PlaybackStateCompat?) {
@@ -131,23 +126,10 @@ class MediaBrowserHelper(
             mediaBrowserHelperCallback.onQueueTitleChanged(title)
         }
 
-
-
-
-
-
-        override fun onExtrasChanged(extras: Bundle?) {
-            super.onExtrasChanged(extras)
-        }
-
         override fun onSessionEvent(event: String?, extras: Bundle?) {
             event?.let {
                 mediaBrowserHelperCallback.onProgressChanged(it.toInt())
             }
-        }
-
-        override fun onAudioInfoChanged(info: MediaControllerCompat.PlaybackInfo?) {
-//            info?.
         }
     }
 }
