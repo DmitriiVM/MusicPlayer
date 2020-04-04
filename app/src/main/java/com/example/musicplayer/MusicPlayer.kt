@@ -4,13 +4,19 @@ import android.annotation.SuppressLint
 import android.app.Notification
 import android.app.PendingIntent
 import android.app.Service
+import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
+import android.content.IntentFilter
 import android.graphics.Bitmap
+import android.media.AudioManager
 import android.os.SystemClock
 import android.support.v4.media.MediaMetadataCompat
+import android.support.v4.media.session.MediaControllerCompat
+import android.support.v4.media.session.MediaSessionCompat
 import android.support.v4.media.session.PlaybackStateCompat
 import androidx.core.content.ContextCompat
+import androidx.media.MediaBrowserServiceCompat
 import com.google.android.exoplayer2.ExoPlayerFactory
 import com.google.android.exoplayer2.Player
 import com.google.android.exoplayer2.SimpleExoPlayer
@@ -25,11 +31,13 @@ import com.google.android.exoplayer2.upstream.RawResourceDataSource
 import com.google.android.exoplayer2.util.Util
 import kotlinx.coroutines.*
 
-class MusicPlayer(private val service: Service) {
+class MusicPlayer(private val service: MediaBrowserServiceCompat) {
 
     private lateinit var exoPlayer: SimpleExoPlayer
     private var playList = listOf<MediaMetadataCompat>()
     private var playbackInfoListener: PlaybackInfoListener? = null
+    private lateinit var becomingNoisyReceiver: BecomingNoisyReceiver
+
 
     fun initializePlayer(
         context: Context,
@@ -48,6 +56,10 @@ class MusicPlayer(private val service: Service) {
 
         val concatenatingMediaSource = buildMediaSource(context, playList)
         exoPlayer.prepare(concatenatingMediaSource, false, false)
+
+        service.sessionToken?.let {
+            becomingNoisyReceiver = BecomingNoisyReceiver(context, it)
+        }
     }
 
     private fun buildMediaSource(
@@ -143,8 +155,10 @@ class MusicPlayer(private val service: Service) {
                     if (playWhenReady) {
                         setState(PlaybackStateCompat.STATE_PLAYING)
                         startTrackingPlayback()
+                        becomingNoisyReceiver.register()
                     } else {
                         setState(PlaybackStateCompat.STATE_PAUSED)
+                        becomingNoisyReceiver.unregister()
                     }
                 }
             }
@@ -229,6 +243,37 @@ class MusicPlayer(private val service: Service) {
         private const val PLAYBACK_CHANNEL_ID = "playback_channel"
         private const val NOTIFICATION_ID = 555
     }
+}
+
+class BecomingNoisyReceiver(
+    private val context: Context,
+    sessionToken: MediaSessionCompat.Token
+) : BroadcastReceiver() {
+
+    private val noisyIntentFilter = IntentFilter(AudioManager.ACTION_AUDIO_BECOMING_NOISY)
+    private val controller = MediaControllerCompat(context, sessionToken)
+    private var registered = false
+
+    fun register(){
+        if (!registered){
+            context.registerReceiver(this, noisyIntentFilter)
+            registered = true
+        }
+    }
+
+    fun unregister(){
+        if (registered){
+            context.unregisterReceiver(this)
+            registered = false
+        }
+    }
+
+    override fun onReceive(context: Context?, intent: Intent?) {
+        if (intent?.action == AudioManager.ACTION_AUDIO_BECOMING_NOISY){
+            controller.transportControls.pause()
+        }
+    }
+
 }
 
 
