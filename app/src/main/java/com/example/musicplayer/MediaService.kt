@@ -1,5 +1,7 @@
 package com.example.musicplayer
 
+import android.app.Notification
+import android.app.Service
 import android.content.Intent
 import android.media.MediaPlayer
 import android.os.Bundle
@@ -8,6 +10,7 @@ import android.support.v4.media.MediaMetadataCompat
 import android.support.v4.media.session.MediaSessionCompat
 import android.support.v4.media.session.PlaybackStateCompat
 import android.util.Log
+import androidx.core.content.ContextCompat
 import androidx.media.MediaBrowserServiceCompat
 
 class MediaService : MediaBrowserServiceCompat() {
@@ -15,31 +18,38 @@ class MediaService : MediaBrowserServiceCompat() {
     private val TAG11 = "mmm"
 
     private var mediaSession: MediaSessionCompat? = null   // фасад для плеера
+    private lateinit var musicPlayer : MusicPlayer
+
+
+    override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
+
+        return Service.START_NOT_STICKY
+    }
 
     override fun onCreate() {
         super.onCreate()
 
+        musicPlayer = MusicPlayer(this)
         mediaSession = MediaSessionCompat(this, TAG).apply {
 //            setFlags(MediaSessionCompat.FLAG_HANDLES_QUEUE_COMMANDS)  // to handle playlist
             setCallback(mediaSessionCallback)
             setSessionToken(sessionToken)  // identify the service
         }
 
-
         val playList = ResourceMediaLibrary.getPlayListAsMediaMetadata(this)
-        MusicPlayer.initializePlayer(this, playList, playbackInfoListener)
+        musicPlayer.initializePlayer(this, playList, playbackInfoListener)
     }
 
     override fun onTaskRemoved(rootIntent: Intent?) {
         super.onTaskRemoved(rootIntent)
 //        Log.d(TAG11, "MediaService   -   onTaskRemoved: stopped")
 //        MusicPlayer.stop()
-        stopSelf()
+//        stopSelf()
     }
 
     override fun onDestroy() {
         super.onDestroy()
-        mediaSession?.release()
+//        mediaSession?.release()
 //        Log.d(TAG11, "MediaService   -   onDestroy: MediaPlayerAdapter stopped, and MediaSession released")
     }
 
@@ -88,31 +98,22 @@ class MediaService : MediaBrowserServiceCompat() {
     private val mediaSessionCallback = object : MediaSessionCompat.Callback() {
 
         override fun onPlay() {
-            MusicPlayer.play()
+
+            musicPlayer.play()
         }
 
         override fun onPause() {
-            MusicPlayer.pause()
+            musicPlayer.pause()
         }
 
         override fun onSkipToNext() {
-            MusicPlayer.skipToNext()
+            musicPlayer.skipToNext()
         }
 
         override fun onSkipToPrevious() {
-            MusicPlayer.skipToPrevious()
+            musicPlayer.skipToPrevious()
         }
     }
-
-
-
-
-
-
-
-
-
-
 
 
     private val playbackInfoListener = object : PlaybackInfoListener {

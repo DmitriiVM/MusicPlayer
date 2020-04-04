@@ -1,6 +1,7 @@
 package com.example.musicplayer
 
 import android.annotation.SuppressLint
+import android.app.Notification
 import android.content.Context
 import android.support.v4.media.MediaMetadataCompat
 import android.support.v4.media.session.PlaybackStateCompat
@@ -11,12 +12,16 @@ import com.google.android.exoplayer2.util.Util
 import com.google.android.exoplayer2.audio.AudioAttributes
 import com.google.android.exoplayer2.ui.PlayerNotificationManager
 import android.app.PendingIntent
+import android.app.Service
 import android.content.Intent
 import android.graphics.Bitmap
 import android.os.Handler
 import android.os.SystemClock
 import android.util.Log
+import androidx.core.app.ServiceCompat.stopForeground
+import androidx.core.content.ContextCompat
 import com.google.android.exoplayer2.*
+import com.google.android.exoplayer2.offline.DownloadService.startForeground
 import com.google.android.exoplayer2.source.ConcatenatingMediaSource
 import com.google.android.exoplayer2.source.TrackGroupArray
 import com.google.android.exoplayer2.trackselection.TrackSelectionArray
@@ -27,8 +32,9 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
 private const val PLAYBACK_CHANNEL_ID = "playback_channel"
+private const val NOTIFICATION_ID = 555
 
-object MusicPlayer {
+class MusicPlayer(private val service: Service) {
 
     private lateinit var exoPlayer: SimpleExoPlayer
     private var playList = listOf<MediaMetadataCompat>()
@@ -80,16 +86,16 @@ object MusicPlayer {
             context,
             PLAYBACK_CHANNEL_ID,
             R.string.playback_channel_name,
-            R.string.temp,
-            88,
-            DescriptionAdapter(context)
+            R.string.channel_description,
+            NOTIFICATION_ID,
+            DescriptionAdapter(context),
+            NotificationListener()
         )
     }
 
 
     fun play() {
         exoPlayer.playWhenReady = true
-//        startTrackingPlayback()
     }
 
     fun pause() {
@@ -113,6 +119,7 @@ object MusicPlayer {
     private fun startTrackingPlayback() {
 
         CoroutineScope(Dispatchers.IO).launch {// отписаться
+
             while (exoPlayer.isPlaying) {
                 playbackInfoListener?.onProgressChanged(
                     exoPlayer.contentPosition
@@ -157,6 +164,7 @@ object MusicPlayer {
 
         override fun onLoadingChanged(isLoading: Boolean) {
             updateMediaMetadata()
+            setState(PlaybackStateCompat.STATE_PAUSED)
         }
     }
 
@@ -175,7 +183,7 @@ object MusicPlayer {
     }
 
 
-    class DescriptionAdapter(private val context: Context) :
+    inner class DescriptionAdapter(private val context: Context) :
         PlayerNotificationManager.MediaDescriptionAdapter {
 
         override fun getCurrentContentTitle(player: Player): String =
@@ -196,10 +204,36 @@ object MusicPlayer {
                 Intent(context, MainActivity::class.java),
                 PendingIntent.FLAG_UPDATE_CURRENT
             )
-
-
     }
 
+    inner class NotificationListener : PlayerNotificationManager.NotificationListener {
+
+        override fun onNotificationCancelled(notificationId: Int) {
+            service.stopSelf()
+        }
+
+        override fun onNotificationStarted(notificationId: Int, notification: Notification?) {
+            ContextCompat.startForegroundService(
+                service.applicationContext,
+                Intent(service.applicationContext, MediaService::class.java)
+            )
+            service.startForeground(notificationId, notification)
+        }
+
+        override fun onNotificationPosted(
+            notificationId: Int, notification: Notification?, ongoing: Boolean
+        ) {
+            if (ongoing) {
+                ContextCompat.startForegroundService(
+                    service.applicationContext,
+                    Intent(service.applicationContext, MediaService::class.java)
+                )
+                service.startForeground(notificationId, notification)
+            } else {
+                service.stopForeground(false)
+            }
+        }
+    }
 }
 
 

@@ -46,7 +46,6 @@ object ResourceMediaLibrary {
             .putString(MediaMetadataCompat.METADATA_KEY_MEDIA_URI, uri.toString())
             .putString(MediaMetadataCompat.METADATA_KEY_TITLE, title)
             .putString(MediaMetadataCompat.METADATA_KEY_ARTIST, artist)
-//            .putString(MediaMetadataCompat.METADATA_KEY_DURATION, duration)
             .putLong(MediaMetadataCompat.METADATA_KEY_DURATION, duration.toLong())
             .putBitmap(MediaMetadataCompat.METADATA_KEY_DISPLAY_ICON, icon)
             .build()
