@@ -7,6 +7,7 @@ import android.support.v4.media.MediaBrowserCompat
 import android.support.v4.media.MediaMetadataCompat
 import android.support.v4.media.session.MediaSessionCompat
 import android.support.v4.media.session.PlaybackStateCompat
+import android.util.Log
 import androidx.media.MediaBrowserServiceCompat
 
 class MediaService : MediaBrowserServiceCompat() {
@@ -21,6 +22,7 @@ class MediaService : MediaBrowserServiceCompat() {
         mediaSession = MediaSessionCompat(this, TAG).apply {
             setCallback(mediaSessionCallback)
             setSessionToken(sessionToken)
+            isActive = true
         }
 
         val playList = ResourceMediaLibrary.getPlayListAsMediaMetadata(this)
@@ -31,38 +33,31 @@ class MediaService : MediaBrowserServiceCompat() {
         return Service.START_NOT_STICKY
     }
 
-    override fun onTaskRemoved(rootIntent: Intent?) {
-        super.onTaskRemoved(rootIntent)
-//        MusicPlayer.stop()
-//        stopSelf()
-    }
-
     override fun onDestroy() {
         super.onDestroy()
-//        mediaSession?.release()
+        mediaSession?.apply {
+            isActive = false
+            release()
+        }
     }
 
     override fun onGetRoot(
         clientPackageName: String, clientUid: Int, rootHints: Bundle?
     ): BrowserRoot? {
-        if (clientPackageName == applicationContext.packageName) {
-            return BrowserRoot(MEDIA_ROOT_ID, null)
-        }
+//        if (clientPackageName == applicationContext.packageName) {
+//            return BrowserRoot(MEDIA_ROOT_ID, null)
+//        }
         return BrowserRoot(EMPTY_MEDIA_ROOT_ID, null)
     }
 
     override fun onLoadChildren(
         parentId: String, result: Result<MutableList<MediaBrowserCompat.MediaItem>>
     ) {
-        if (parentId == EMPTY_MEDIA_ROOT_ID) {
-            result.sendResult(null)
-            return
-        }
-
-        if (MEDIA_ROOT_ID == parentId) {
-//            result.sendResult(ResourceMediaLibrary.getMediaItems())
-        }
-        result.sendResult(ResourceMediaLibrary.getMediaItemsList(this))
+//        if (MEDIA_ROOT_ID == parentId) {
+//            result.sendResult(ResourceMediaLibrary.getMediaItemsList(this))
+//        } else {
+//            result.sendResult(null)
+//        }
     }
 
     private val mediaSessionCallback = object : MediaSessionCompat.Callback() {
@@ -110,6 +105,6 @@ class MediaService : MediaBrowserServiceCompat() {
     companion object {
         private const val TAG = "media_session"
         private const val MEDIA_ROOT_ID = "media_root_id"
-        private const val EMPTY_MEDIA_ROOT_ID = "media_root_id"
+        private const val EMPTY_MEDIA_ROOT_ID = "empty_media_root_id"
     }
 }

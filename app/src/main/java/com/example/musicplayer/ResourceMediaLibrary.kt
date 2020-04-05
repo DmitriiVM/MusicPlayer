@@ -54,22 +54,6 @@ object ResourceMediaLibrary {
 
     //---------------------------------------------------------
 
-    private fun buildMediaMetadata(context: Context, uri: Uri): MediaMetadataCompat {
-        val retriever = MediaMetadataRetriever()
-        retriever.setDataSource(context, uri)
-
-        val title = retriever.extractMetadata(MediaMetadataRetriever.METADATA_KEY_TITLE)
-        val artist = retriever.extractMetadata(MediaMetadataRetriever.METADATA_KEY_ARTIST)
-
-
-        return MediaMetadataCompat.Builder()
-            .putString(MediaMetadataCompat.METADATA_KEY_MEDIA_ID, "$artist $title")
-            .putString(MediaMetadataCompat.METADATA_KEY_TITLE, title)
-            .putString(MediaMetadataCompat.METADATA_KEY_ARTIST, artist)
-            .putString(MediaMetadataCompat.METADATA_KEY_MEDIA_URI, uri.toString())
-            .build()
-    }
-
 
     fun getMediaItemsList(context: Context): MutableList<MediaBrowserCompat.MediaItem> {
 
@@ -90,12 +74,29 @@ object ResourceMediaLibrary {
         return mediaItemList
     }
 
-
-
-
     private fun buildMediaItem(context: Context, uri: Uri) =
         MediaBrowserCompat.MediaItem(
             buildMediaMetadata(context, uri).description,
             MediaBrowserCompat.MediaItem.FLAG_PLAYABLE
         )
+
+    private fun buildMediaMetadata(context: Context, uri: Uri): MediaMetadataCompat {
+        val retriever = MediaMetadataRetriever()
+        retriever.setDataSource(context, uri)
+
+        val title = retriever.extractMetadata(MediaMetadataRetriever.METADATA_KEY_TITLE)
+        val artist = retriever.extractMetadata(MediaMetadataRetriever.METADATA_KEY_ARTIST)
+
+
+        return MediaMetadataCompat.Builder()
+            .putString(MediaMetadataCompat.METADATA_KEY_MEDIA_ID, "$artist $title")
+            .putString(MediaMetadataCompat.METADATA_KEY_TITLE, title)
+            .putString(MediaMetadataCompat.METADATA_KEY_ARTIST, artist)
+            .putString(MediaMetadataCompat.METADATA_KEY_MEDIA_URI, uri.toString())
+            .build()
+    }
+
+
+
+
 }

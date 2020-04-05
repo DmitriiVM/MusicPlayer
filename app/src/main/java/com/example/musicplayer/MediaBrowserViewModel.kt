@@ -7,6 +7,7 @@ import android.support.v4.media.MediaBrowserCompat
 import android.support.v4.media.MediaMetadataCompat
 import android.support.v4.media.session.MediaControllerCompat
 import android.support.v4.media.session.PlaybackStateCompat
+import android.util.Log
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
@@ -43,33 +44,17 @@ class MediaBrowserViewModel(private val app: Application) : AndroidViewModel(app
     }
 
     fun onStop() {
-        if (mediaController != null) {
-            mediaController!!.unregisterCallback(mediaControllerCallback)
-            mediaController = null
-        }
-        if (mediaBrowser.isConnected) {
-            mediaBrowser.disconnect()
-        }
+        mediaController?.unregisterCallback(mediaControllerCallback)
+        if (mediaBrowser.isConnected)  mediaBrowser.disconnect()
     }
-
 
     private val connectionCallback = object : MediaBrowserCompat.ConnectionCallback() {
 
         override fun onConnected() {
             mediaController =
                 MediaControllerCompat(app.applicationContext, mediaBrowser.sessionToken)
-            mediaController!!.registerCallback(mediaControllerCallback)
-            mediaBrowser.subscribe(mediaBrowser.root, MediaBrowserSubscriptionCallback())
-            mediaController!!.transportControls.prepare()
-        }
-    }
-
-    inner class MediaBrowserSubscriptionCallback : MediaBrowserCompat.SubscriptionCallback() {
-
-        override fun onChildrenLoaded(
-            parentId: String, children: MutableList<MediaBrowserCompat.MediaItem>
-        ) {
-            children.forEach { mediaController?.addQueueItem(it.description) }
+            mediaController?.registerCallback(mediaControllerCallback)
+            mediaController?.transportControls?.prepare()
         }
     }
 

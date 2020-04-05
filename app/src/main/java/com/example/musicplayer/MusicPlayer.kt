@@ -48,7 +48,7 @@ class MusicPlayer(private val service: MediaBrowserServiceCompat) {
         notificationManager.setPlayer(exoPlayer)
         exoPlayer.addListener(exoPlayerEventListener)
 
-        val concatenatingMediaSource= buildMediaSource(playList)
+        val concatenatingMediaSource = buildMediaSource(playList)
         exoPlayer.prepare(concatenatingMediaSource, false, false)
     }
 
@@ -75,7 +75,7 @@ class MusicPlayer(private val service: MediaBrowserServiceCompat) {
             R.string.channel_description,
             NOTIFICATION_ID,
             DescriptionAdapter(context),
-            NotificationListener()
+            NotificationListener(service, context)
         )
     }
 
@@ -146,7 +146,7 @@ class MusicPlayer(private val service: MediaBrowserServiceCompat) {
                 while (true) {
                     withContext(Dispatchers.Main) {
                         if (!exoPlayer.isPlaying) cancel()
-                        playbackInfoListener?.onProgressChanged( exoPlayer.contentPosition)
+                        playbackInfoListener?.onProgressChanged(exoPlayer.contentPosition)
                     }
                     delay(200)
                 }
@@ -198,7 +198,10 @@ class MusicPlayer(private val service: MediaBrowserServiceCompat) {
             )
     }
 
-    inner class NotificationListener : PlayerNotificationManager.NotificationListener {
+    class NotificationListener(
+        private val service: MediaBrowserServiceCompat,
+        private val context: Context
+    ) : PlayerNotificationManager.NotificationListener {
 
         override fun onNotificationCancelled(notificationId: Int) {
             service.stopSelf()
@@ -206,8 +209,7 @@ class MusicPlayer(private val service: MediaBrowserServiceCompat) {
 
         override fun onNotificationStarted(notificationId: Int, notification: Notification?) {
             ContextCompat.startForegroundService(
-                context,
-                Intent(context, MediaService::class.java)
+                context, Intent(context, MediaService::class.java)
             )
             service.startForeground(notificationId, notification)
         }
@@ -217,8 +219,7 @@ class MusicPlayer(private val service: MediaBrowserServiceCompat) {
         ) {
             if (ongoing) {
                 ContextCompat.startForegroundService(
-                    context,
-                    Intent(context, MediaService::class.java)
+                    context, Intent(context, MediaService::class.java)
                 )
                 service.startForeground(notificationId, notification)
             } else {
