@@ -1,10 +1,11 @@
-package com.example.musicplayer
+package com.example.musicplayer.server
 
 import android.content.Context
 import android.graphics.BitmapFactory
 import android.media.MediaMetadataRetriever
 import android.net.Uri
 import android.support.v4.media.MediaMetadataCompat
+import com.example.musicplayer.R
 
 object ResourceMediaLibrary {
 
@@ -16,13 +17,19 @@ object ResourceMediaLibrary {
             R.raw.gorillaz_on_melancholy_hill,
             R.raw.bullet,
             R.raw.fever_for_the_flava,
-            R.raw.jet)
+            R.raw.jet
+        )
     }
 
     fun getPlayListAsMediaMetadata(context: Context) : List<MediaMetadataCompat> {
         val list = arrayListOf<MediaMetadataCompat>()
         playlist.forEach {
-            list.add(buildMediaMetadataWithBitmap(context, it))
+            list.add(
+                buildMediaMetadataWithBitmap(
+                    context,
+                    it
+                )
+            )
         }
         return list
     }

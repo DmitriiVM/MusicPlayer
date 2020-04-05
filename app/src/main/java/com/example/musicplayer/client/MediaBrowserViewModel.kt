@@ -1,4 +1,4 @@
-package com.example.musicplayer
+package com.example.musicplayer.client
 
 import android.app.Application
 import android.content.ComponentName
@@ -10,6 +10,7 @@ import android.support.v4.media.session.PlaybackStateCompat
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
+import com.example.musicplayer.server.MediaService
 
 class MediaBrowserViewModel(private val app: Application) : AndroidViewModel(app) {
 

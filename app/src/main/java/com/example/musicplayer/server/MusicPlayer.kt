@@ -1,9 +1,8 @@
-package com.example.musicplayer
+package com.example.musicplayer.server
 
 import android.annotation.SuppressLint
 import android.app.Notification
 import android.app.PendingIntent
-import android.content.Context
 import android.content.Intent
 import android.graphics.Bitmap
 import android.os.SystemClock
@@ -11,6 +10,8 @@ import android.support.v4.media.MediaMetadataCompat
 import android.support.v4.media.session.PlaybackStateCompat
 import androidx.core.content.ContextCompat
 import androidx.media.MediaBrowserServiceCompat
+import com.example.musicplayer.R
+import com.example.musicplayer.client.MainActivity
 import com.google.android.exoplayer2.ExoPlayerFactory
 import com.google.android.exoplayer2.Player
 import com.google.android.exoplayer2.SimpleExoPlayer
@@ -74,8 +75,8 @@ class MusicPlayer(private val service: MediaBrowserServiceCompat) {
             R.string.playback_channel_name,
             R.string.channel_description,
             NOTIFICATION_ID,
-            DescriptionAdapter(context),
-            NotificationListener(service, context)
+            descriptionAdapter,
+            notificationListener
         )
     }
 
@@ -173,7 +174,7 @@ class MusicPlayer(private val service: MediaBrowserServiceCompat) {
     }
 
 
-    inner class DescriptionAdapter(private val context: Context) :
+    private val descriptionAdapter = object :
         PlayerNotificationManager.MediaDescriptionAdapter {
 
         override fun getCurrentContentTitle(player: Player): String =
@@ -196,10 +197,7 @@ class MusicPlayer(private val service: MediaBrowserServiceCompat) {
             )
     }
 
-    class NotificationListener(
-        private val service: MediaBrowserServiceCompat,
-        private val context: Context
-    ) : PlayerNotificationManager.NotificationListener {
+    private val notificationListener = object : PlayerNotificationManager.NotificationListener {
 
         override fun onNotificationCancelled(notificationId: Int) {
             service.stopSelf()

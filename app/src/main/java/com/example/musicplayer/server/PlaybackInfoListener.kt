@@ -1,4 +1,4 @@
-package com.example.musicplayer
+package com.example.musicplayer.server
 
 import android.support.v4.media.MediaMetadataCompat
 import android.support.v4.media.session.PlaybackStateCompat

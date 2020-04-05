@@ -1,4 +1,4 @@
-package com.example.musicplayer
+package com.example.musicplayer.server
 
 import android.app.Service
 import android.content.Intent
@@ -18,13 +18,16 @@ class MediaService : MediaBrowserServiceCompat() {
         super.onCreate()
 
         musicPlayer = MusicPlayer(this)
-        mediaSession = MediaSessionCompat(this, TAG).apply {
+        mediaSession = MediaSessionCompat(this,
+            TAG
+        ).apply {
             setCallback(mediaSessionCallback)
             setSessionToken(sessionToken)
             isActive = true
         }
 
-        val playList = ResourceMediaLibrary.getPlayListAsMediaMetadata(this)
+        val playList =
+            ResourceMediaLibrary.getPlayListAsMediaMetadata(this)
         musicPlayer.initializePlayer(playList, playbackInfoListener)
     }
 
@@ -74,7 +77,8 @@ class MediaService : MediaBrowserServiceCompat() {
         }
     }
 
-    private val playbackInfoListener = object : PlaybackInfoListener {
+    private val playbackInfoListener = object :
+        PlaybackInfoListener {
 
         override fun onPlaybackStateChange(state: PlaybackStateCompat) {
             mediaSession?.setPlaybackState(state)

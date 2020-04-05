@@ -1,4 +1,4 @@
-package com.example.musicplayer
+package com.example.musicplayer.client
 
 import android.os.Bundle
 import android.support.v4.media.MediaMetadataCompat
@@ -6,6 +6,7 @@ import android.support.v4.media.session.PlaybackStateCompat
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
+import com.example.musicplayer.R
 import kotlinx.android.synthetic.main.activity_main.*
 
 class MainActivity : AppCompatActivity() {
