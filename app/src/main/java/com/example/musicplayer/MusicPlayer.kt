@@ -79,7 +79,6 @@ class MusicPlayer(private val service: MediaBrowserServiceCompat) {
         )
     }
 
-
     fun play() {
         exoPlayer.playWhenReady = true
     }
@@ -105,7 +104,6 @@ class MusicPlayer(private val service: MediaBrowserServiceCompat) {
     }
 
     fun releasePlayer() {
-//        playerNotificationManager.setPlayer(null)
         exoPlayer.release()
     }
 
