@@ -1,18 +1,14 @@
 package com.example.musicplayer
 
-import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
-import android.os.PersistableBundle
-import kotlinx.android.synthetic.main.activity_main.*
 import android.support.v4.media.MediaMetadataCompat
 import android.support.v4.media.session.PlaybackStateCompat
-import android.util.Log
+import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
+import kotlinx.android.synthetic.main.activity_main.*
 
-
-class MainActivity : AppCompatActivity(),
-    MediaBrowserHelperCallback {
+class MainActivity : AppCompatActivity() {
 
     private lateinit var mediaBrowserViewModel: MediaBrowserViewModel
 
@@ -21,7 +17,7 @@ class MainActivity : AppCompatActivity(),
         setContentView(R.layout.activity_main)
 
         mediaBrowserViewModel = ViewModelProvider(
-                this, ViewModelProvider.AndroidViewModelFactory(this.application)
+            this, ViewModelProvider.AndroidViewModelFactory(this.application)
         ).get(MediaBrowserViewModel::class.java)
 
         imageViewSkipToNext.setOnClickListener {
@@ -30,7 +26,6 @@ class MainActivity : AppCompatActivity(),
         imageViewSkipToPrevious.setOnClickListener {
             mediaBrowserViewModel.getTransportControls().skipToPrevious()
         }
-
         subscribeObservers()
     }
 
@@ -44,7 +39,7 @@ class MainActivity : AppCompatActivity(),
             progressBar.max = duration.toInt()
         })
         mediaBrowserViewModel.nextSongLiveData.observe(this, Observer {
-            textViewNextTrack.text = it
+            textViewNextTrack.text = getString(R.string.next_track, it)
         })
         mediaBrowserViewModel.progressLiveData.observe(this, Observer {
             progressBar.progress = it
@@ -76,5 +71,4 @@ class MainActivity : AppCompatActivity(),
         super.onStop()
         mediaBrowserViewModel.onStop()
     }
-
 }

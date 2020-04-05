@@ -1,6 +1,8 @@
 <resources>
     <string name="app_name">MusicPlayer</string>
 
+    <string name="next_track">Next track: %s</string>
+
     <string name="playback_channel_name">Now playing</string>
     <string name="channel_description">Current track notification and control</string>
 </resources>

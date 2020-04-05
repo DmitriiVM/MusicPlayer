@@ -15,6 +15,7 @@ object ResourceMediaLibrary {
     init {
         playlist = arrayListOf(
             R.raw.thekillers,
+            R.raw.gorillaz_on_melancholy_hill,
             R.raw.bullet,
             R.raw.fever_for_the_flava,
             R.raw.jet)

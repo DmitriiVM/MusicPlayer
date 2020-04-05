@@ -3,19 +3,12 @@ package com.example.musicplayer
 import android.annotation.SuppressLint
 import android.app.Notification
 import android.app.PendingIntent
-import android.app.Service
-import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
-import android.content.IntentFilter
 import android.graphics.Bitmap
-import android.media.AudioManager
 import android.os.SystemClock
 import android.support.v4.media.MediaMetadataCompat
-import android.support.v4.media.session.MediaControllerCompat
-import android.support.v4.media.session.MediaSessionCompat
 import android.support.v4.media.session.PlaybackStateCompat
-import android.util.Log
 import androidx.core.content.ContextCompat
 import androidx.media.MediaBrowserServiceCompat
 import com.google.android.exoplayer2.ExoPlayerFactory
@@ -38,9 +31,10 @@ class MusicPlayer(private val service: MediaBrowserServiceCompat) {
     private var playList = listOf<MediaMetadataCompat>()
     private var playbackInfoListener: PlaybackInfoListener? = null
     private var playbackState: PlaybackStateCompat? = null
+    var job: Job? = null
+    private val context = service.applicationContext
 
     fun initializePlayer(
-        context: Context,
         playList: List<MediaMetadataCompat>,
         playbackInfoListener: PlaybackInfoListener
     ) {
@@ -50,17 +44,15 @@ class MusicPlayer(private val service: MediaBrowserServiceCompat) {
         exoPlayer = ExoPlayerFactory.newSimpleInstance(context)
         exoPlayer.setAudioAttributes(AudioAttributes.DEFAULT, true)
 
-        val notificationManager = buildNotificationManager(context)
+        val notificationManager = buildNotificationManager()
         notificationManager.setPlayer(exoPlayer)
         exoPlayer.addListener(exoPlayerEventListener)
 
-        val concatenatingMediaSource = buildMediaSource(context, playList)
+        val concatenatingMediaSource= buildMediaSource(playList)
         exoPlayer.prepare(concatenatingMediaSource, false, false)
     }
 
-    private fun buildMediaSource(
-        context: Context, playList: List<MediaMetadataCompat>
-    ): ConcatenatingMediaSource {
+    private fun buildMediaSource(playList: List<MediaMetadataCompat>): ConcatenatingMediaSource {
 
         val concatenatingMediaSource = ConcatenatingMediaSource()
         val userAgent = Util.getUserAgent(context, context.getString(R.string.app_name))
@@ -75,7 +67,7 @@ class MusicPlayer(private val service: MediaBrowserServiceCompat) {
         return concatenatingMediaSource
     }
 
-    private fun buildNotificationManager(context: Context): PlayerNotificationManager {
+    private fun buildNotificationManager(): PlayerNotificationManager {
         return PlayerNotificationManager.createWithNotificationChannel(
             context,
             PLAYBACK_CHANNEL_ID,
@@ -104,17 +96,8 @@ class MusicPlayer(private val service: MediaBrowserServiceCompat) {
         exoPlayer.previous()
     }
 
-    fun onPrepare(){
-        Log.d("mmm", "MusicPlayer :  onPrepare --  ")
-        var nextSongInfo = ""
-        if (exoPlayer.nextWindowIndex != -1) {
-            val nextSongArtist =
-                playList[exoPlayer.nextWindowIndex].getString(MediaMetadataCompat.METADATA_KEY_ARTIST)
-            val nextSongTitle =
-                playList[exoPlayer.nextWindowIndex].getString(MediaMetadataCompat.METADATA_KEY_TITLE)
-            nextSongInfo = "$nextSongArtist - $nextSongTitle"
-        }
-        playbackInfoListener?.updateMediaMetadata(playList[exoPlayer.currentWindowIndex], nextSongInfo)
+    fun onPrepare() {
+        updateMediaMetadata()
         playbackState?.let {
             playbackInfoListener?.onPlaybackStateChange(it)
         }
@@ -124,22 +107,6 @@ class MusicPlayer(private val service: MediaBrowserServiceCompat) {
     fun releasePlayer() {
 //        playerNotificationManager.setPlayer(null)
         exoPlayer.release()
-    }
-
-    private fun startTrackingPlayback() {
-
-        CoroutineScope(Dispatchers.IO).launch {// отписаться
-
-            while (true) {
-                withContext(Dispatchers.Main){
-                    if (!exoPlayer.isPlaying) this.cancel()
-                    playbackInfoListener?.onProgressChanged(
-                        exoPlayer.contentPosition
-                    )
-                }
-                delay(200)
-            }
-        }
     }
 
     @SuppressLint("WrongConstant")
@@ -152,12 +119,10 @@ class MusicPlayer(private val service: MediaBrowserServiceCompat) {
         }
     }
 
-
     private val exoPlayerEventListener = object : Player.EventListener {
 
         override fun onTracksChanged(
-            trackGroups: TrackGroupArray,
-            trackSelections: TrackSelectionArray
+            trackGroups: TrackGroupArray, trackSelections: TrackSelectionArray
         ) {
             updateMediaMetadata()
             playbackInfoListener?.onProgressChanged(0)
@@ -176,6 +141,17 @@ class MusicPlayer(private val service: MediaBrowserServiceCompat) {
             }
         }
 
+        private fun startTrackingPlayback() {
+            job = CoroutineScope(Dispatchers.IO).launch {
+                while (true) {
+                    withContext(Dispatchers.Main) {
+                        if (!exoPlayer.isPlaying) cancel()
+                        playbackInfoListener?.onProgressChanged( exoPlayer.contentPosition)
+                    }
+                    delay(200)
+                }
+            }
+        }
 
         override fun onLoadingChanged(isLoading: Boolean) {
             updateMediaMetadata()
@@ -230,8 +206,8 @@ class MusicPlayer(private val service: MediaBrowserServiceCompat) {
 
         override fun onNotificationStarted(notificationId: Int, notification: Notification?) {
             ContextCompat.startForegroundService(
-                service.applicationContext,
-                Intent(service.applicationContext, MediaService::class.java)
+                context,
+                Intent(context, MediaService::class.java)
             )
             service.startForeground(notificationId, notification)
         }
@@ -241,8 +217,8 @@ class MusicPlayer(private val service: MediaBrowserServiceCompat) {
         ) {
             if (ongoing) {
                 ContextCompat.startForegroundService(
-                    service.applicationContext,
-                    Intent(service.applicationContext, MediaService::class.java)
+                    context,
+                    Intent(context, MediaService::class.java)
                 )
                 service.startForeground(notificationId, notification)
             } else {
