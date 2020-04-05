@@ -5,6 +5,7 @@ import android.app.Notification
 import android.app.PendingIntent
 import android.content.Intent
 import android.graphics.Bitmap
+import android.media.session.PlaybackState
 import android.os.SystemClock
 import android.support.v4.media.MediaMetadataCompat
 import android.support.v4.media.session.PlaybackStateCompat
@@ -111,6 +112,9 @@ class MusicPlayer(private val service: MediaBrowserServiceCompat) {
     @SuppressLint("WrongConstant")
     private fun setState(state: Int) {
         playbackState = PlaybackStateCompat.Builder()
+            .setActions(PlaybackState.ACTION_PLAY_PAUSE
+                        or PlaybackState.ACTION_SKIP_TO_NEXT
+                        or PlaybackState.ACTION_SKIP_TO_PREVIOUS)
             .setState(state, 0, 1.0f, SystemClock.elapsedRealtime())
             .build()
         playbackState?.let {
