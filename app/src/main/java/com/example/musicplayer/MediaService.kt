@@ -113,6 +113,12 @@ class MediaService : MediaBrowserServiceCompat() {
         override fun onSkipToPrevious() {
             musicPlayer.skipToPrevious()
         }
+
+        override fun onPrepare() {
+
+            musicPlayer.onPrepare()
+            Log.d("mmm", "MediaService :  onPrepare --  ")
+        }
     }
 
 

@@ -15,6 +15,7 @@ import android.support.v4.media.MediaMetadataCompat
 import android.support.v4.media.session.MediaControllerCompat
 import android.support.v4.media.session.MediaSessionCompat
 import android.support.v4.media.session.PlaybackStateCompat
+import android.util.Log
 import androidx.core.content.ContextCompat
 import androidx.media.MediaBrowserServiceCompat
 import com.google.android.exoplayer2.ExoPlayerFactory
@@ -36,6 +37,7 @@ class MusicPlayer(private val service: MediaBrowserServiceCompat) {
     private lateinit var exoPlayer: SimpleExoPlayer
     private var playList = listOf<MediaMetadataCompat>()
     private var playbackInfoListener: PlaybackInfoListener? = null
+    private var playbackState: PlaybackStateCompat? = null
 
     fun initializePlayer(
         context: Context,
@@ -102,6 +104,22 @@ class MusicPlayer(private val service: MediaBrowserServiceCompat) {
         exoPlayer.previous()
     }
 
+    fun onPrepare(){
+        Log.d("mmm", "MusicPlayer :  onPrepare --  ")
+        var nextSongInfo = ""
+        if (exoPlayer.nextWindowIndex != -1) {
+            val nextSongArtist =
+                playList[exoPlayer.nextWindowIndex].getString(MediaMetadataCompat.METADATA_KEY_ARTIST)
+            val nextSongTitle =
+                playList[exoPlayer.nextWindowIndex].getString(MediaMetadataCompat.METADATA_KEY_TITLE)
+            nextSongInfo = "$nextSongArtist - $nextSongTitle"
+        }
+        playbackInfoListener?.updateMediaMetadata(playList[exoPlayer.currentWindowIndex], nextSongInfo)
+        playbackState?.let {
+            playbackInfoListener?.onPlaybackStateChange(it)
+        }
+        playbackInfoListener?.onProgressChanged(exoPlayer.contentPosition)
+    }
 
     fun releasePlayer() {
 //        playerNotificationManager.setPlayer(null)
@@ -126,10 +144,12 @@ class MusicPlayer(private val service: MediaBrowserServiceCompat) {
 
     @SuppressLint("WrongConstant")
     private fun setState(state: Int) {
-        val playbackState = PlaybackStateCompat.Builder()
+        playbackState = PlaybackStateCompat.Builder()
             .setState(state, 0, 1.0f, SystemClock.elapsedRealtime())
             .build()
-        playbackInfoListener?.onPlaybackStateChange(playbackState)
+        playbackState?.let {
+            playbackInfoListener?.onPlaybackStateChange(it)
+        }
     }
 
 
