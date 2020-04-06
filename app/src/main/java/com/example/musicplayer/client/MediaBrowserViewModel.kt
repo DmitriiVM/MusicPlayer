@@ -7,6 +7,7 @@ import android.support.v4.media.MediaBrowserCompat
 import android.support.v4.media.MediaMetadataCompat
 import android.support.v4.media.session.MediaControllerCompat
 import android.support.v4.media.session.PlaybackStateCompat
+import android.util.Log
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
@@ -21,9 +22,9 @@ class MediaBrowserViewModel(private val app: Application) : AndroidViewModel(app
     val metadataLiveData: LiveData<MediaMetadataCompat>
         get() = _metadataLiveData
 
-    private val _nextSongLiveData = MutableLiveData<CharSequence>()
-    val nextSongLiveData: LiveData<CharSequence>
-        get() = _nextSongLiveData
+    private val _currentPositionLiveData = MutableLiveData<CharSequence>()
+    val currentPositionLiveData: LiveData<CharSequence>
+        get() = _currentPositionLiveData
 
     private val _playbackStateLiveData = MutableLiveData<PlaybackStateCompat>()
     val playbackStateLiveData: LiveData<PlaybackStateCompat>
@@ -32,6 +33,10 @@ class MediaBrowserViewModel(private val app: Application) : AndroidViewModel(app
     private val _progressLiveData = MutableLiveData<Int>()
     val progressLiveData: LiveData<Int>
         get() = _progressLiveData
+
+    private val _playListLiveData = MutableLiveData<List<MediaBrowserCompat.MediaItem>>()
+    val playListLiveData: LiveData<List<MediaBrowserCompat.MediaItem>>
+        get() = _playListLiveData
 
     fun onStart() {
         mediaBrowser = MediaBrowserCompat(
@@ -45,7 +50,7 @@ class MediaBrowserViewModel(private val app: Application) : AndroidViewModel(app
 
     fun onStop() {
         mediaController?.unregisterCallback(mediaControllerCallback)
-        if (mediaBrowser.isConnected)  mediaBrowser.disconnect()
+        if (mediaBrowser.isConnected) mediaBrowser.disconnect()
     }
 
     private val connectionCallback = object : MediaBrowserCompat.ConnectionCallback() {
@@ -54,9 +59,20 @@ class MediaBrowserViewModel(private val app: Application) : AndroidViewModel(app
             mediaController =
                 MediaControllerCompat(app.applicationContext, mediaBrowser.sessionToken)
             mediaController?.registerCallback(mediaControllerCallback)
+            mediaBrowser.subscribe(mediaBrowser.root, mediaBrowserSubscriptionCallback)
             mediaController?.transportControls?.prepare()
         }
     }
+
+    private val mediaBrowserSubscriptionCallback =
+        object : MediaBrowserCompat.SubscriptionCallback() {
+
+            override fun onChildrenLoaded(
+                parentId: String, children: MutableList<MediaBrowserCompat.MediaItem>
+            ) {
+                _playListLiveData.value = children
+            }
+        }
 
     fun getTransportControls(): MediaControllerCompat.TransportControls =
         mediaController!!.transportControls
@@ -75,8 +91,9 @@ class MediaBrowserViewModel(private val app: Application) : AndroidViewModel(app
             }
         }
 
-        override fun onQueueTitleChanged(title: CharSequence?) {
-            _nextSongLiveData.value = title
+        override fun onQueueTitleChanged(currentPosition: CharSequence?) {
+//            Log.d("mmm", "MediaBrowserViewModel :  onQueueTitleChanged --  ")
+            _currentPositionLiveData.value = currentPosition
         }
 
         override fun onSessionEvent(event: String?, extras: Bundle?) {
@@ -84,5 +101,8 @@ class MediaBrowserViewModel(private val app: Application) : AndroidViewModel(app
                 _progressLiveData.value = it.toInt()
             }
         }
+
+
+
     }
 }

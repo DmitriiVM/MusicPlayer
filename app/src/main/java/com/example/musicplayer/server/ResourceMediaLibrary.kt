@@ -4,6 +4,7 @@ import android.content.Context
 import android.graphics.BitmapFactory
 import android.media.MediaMetadataRetriever
 import android.net.Uri
+import android.support.v4.media.MediaBrowserCompat
 import android.support.v4.media.MediaMetadataCompat
 import com.example.musicplayer.R
 
@@ -13,11 +14,12 @@ object ResourceMediaLibrary {
 
     init {
         playlist = arrayListOf(
-            R.raw.thekillers,
             R.raw.gorillaz_on_melancholy_hill,
+            R.raw.thekillers,
             R.raw.bullet,
-            R.raw.fever_for_the_flava,
-            R.raw.jet
+            R.raw.fratellis_baby_dont_you_lie_to_me
+//            R.raw.hiding_in_my_headphones
+//            R.raw.jet
         )
     }
 
@@ -25,7 +27,7 @@ object ResourceMediaLibrary {
         val list = arrayListOf<MediaMetadataCompat>()
         playlist.forEach {
             list.add(
-                buildMediaMetadataWithBitmap(
+                buildMediaMetadata(
                     context,
                     it
                 )
@@ -34,7 +36,16 @@ object ResourceMediaLibrary {
         return list
     }
 
-    private fun buildMediaMetadataWithBitmap(context: Context, track: Int): MediaMetadataCompat {
+    fun getPlayListAsMediaItem(context: Context) : MutableList<MediaBrowserCompat.MediaItem>{
+        val playListAsMediaItem = arrayListOf<MediaBrowserCompat.MediaItem>()
+        getPlayListAsMediaMetadata(context).forEach {
+            val mediaItem = MediaBrowserCompat.MediaItem(it.description, MediaBrowserCompat.MediaItem.FLAG_PLAYABLE)
+            playListAsMediaItem.add(mediaItem)
+        }
+        return playListAsMediaItem
+    }
+
+    private fun buildMediaMetadata(context: Context, track: Int): MediaMetadataCompat {
         val retriever = MediaMetadataRetriever()
         val uri = Uri.parse("android.resource://${context.packageName}/$track")
         retriever.setDataSource(context, uri)

@@ -9,6 +9,7 @@ import android.media.session.PlaybackState
 import android.os.SystemClock
 import android.support.v4.media.MediaMetadataCompat
 import android.support.v4.media.session.PlaybackStateCompat
+import android.util.Log
 import androidx.core.content.ContextCompat
 import androidx.media.MediaBrowserServiceCompat
 import com.example.musicplayer.R
@@ -101,8 +102,14 @@ class MusicPlayer(private val service: MediaBrowserServiceCompat) {
         exoPlayer.seekTo(pos)
     }
 
+    fun playSelectedTrack(position: Int){
+        exoPlayer.playWhenReady = true
+        exoPlayer.seekTo(position, 0)
+    }
+
     fun onPrepare() {
         updateMediaMetadata()
+        Log.d("mmm", "MusicPlayer :  onPrepare --  ")
         playbackState?.let {
             playbackInfoListener?.onPlaybackStateChange(it)
         }
@@ -126,13 +133,22 @@ class MusicPlayer(private val service: MediaBrowserServiceCompat) {
         }
     }
 
+    var isClickHandled = false
+
     private val exoPlayerEventListener = object : Player.EventListener {
 
         override fun onTracksChanged(
             trackGroups: TrackGroupArray, trackSelections: TrackSelectionArray
         ) {
-            updateMediaMetadata()
-            playbackInfoListener?.onProgressChanged(0)
+            if (isClickHandled) {
+                updateMediaMetadata()
+                playbackInfoListener?.onProgressChanged(0)
+                isClickHandled = false
+            } else {
+                isClickHandled = true
+            }
+            Log.d("mmm", "MusicPlayer :  onTracksChanged --  ")
+
         }
 
         override fun onPlayerStateChanged(playWhenReady: Boolean, playbackState: Int) {
@@ -161,24 +177,18 @@ class MusicPlayer(private val service: MediaBrowserServiceCompat) {
         }
 
         override fun onLoadingChanged(isLoading: Boolean) {
-            updateMediaMetadata()
+//            updateMediaMetadata()
+//            Log.d("mmm", "MusicPlayer :  onLoadingChanged --  ")
             if (exoPlayer.playWhenReady) return
             setState(PlaybackStateCompat.STATE_PAUSED)
         }
     }
 
     private fun updateMediaMetadata() {
-        val currentTrackMediaMetadata = playList[exoPlayer.currentWindowIndex]
+        val currentPosition = exoPlayer.currentWindowIndex
+        val currentTrackMediaMetadata = playList[currentPosition]
 
-        var nextSongInfo = ""
-        if (exoPlayer.nextWindowIndex != -1) {
-            val nextSongArtist =
-                playList[exoPlayer.nextWindowIndex].getString(MediaMetadataCompat.METADATA_KEY_ARTIST)
-            val nextSongTitle =
-                playList[exoPlayer.nextWindowIndex].getString(MediaMetadataCompat.METADATA_KEY_TITLE)
-            nextSongInfo = "$nextSongArtist - $nextSongTitle"
-        }
-        playbackInfoListener?.updateMediaMetadata(currentTrackMediaMetadata, nextSongInfo)
+        playbackInfoListener?.updateMediaMetadata(currentTrackMediaMetadata, currentPosition.toString())
     }
 
 

@@ -7,6 +7,7 @@ import android.support.v4.media.MediaBrowserCompat
 import android.support.v4.media.MediaMetadataCompat
 import android.support.v4.media.session.MediaSessionCompat
 import android.support.v4.media.session.PlaybackStateCompat
+import android.util.Log
 import androidx.media.MediaBrowserServiceCompat
 
 class MediaService : MediaBrowserServiceCompat() {
@@ -47,12 +48,14 @@ class MediaService : MediaBrowserServiceCompat() {
     override fun onGetRoot(
         clientPackageName: String, clientUid: Int, rootHints: Bundle?
     ): BrowserRoot? {
-        return BrowserRoot(EMPTY_MEDIA_ROOT_ID, null)
+        return BrowserRoot(MEDIA_ROOT_ID, null)
     }
 
     override fun onLoadChildren(
         parentId: String, result: Result<MutableList<MediaBrowserCompat.MediaItem>>
-    ) { }
+    ) {
+        result.sendResult(ResourceMediaLibrary.getPlayListAsMediaItem(this))
+    }
 
     private val mediaSessionCallback = object : MediaSessionCompat.Callback() {
 
@@ -79,6 +82,12 @@ class MediaService : MediaBrowserServiceCompat() {
         override fun onSeekTo(pos: Long) {
             musicPlayer.seekTo(pos)
         }
+
+        override fun onPlayFromMediaId(mediaId: String?, extras: Bundle?) {
+            mediaId?.let {
+                musicPlayer.playSelectedTrack(mediaId.toInt())
+            }
+        }
     }
 
     private val playbackInfoListener = object :
@@ -94,15 +103,15 @@ class MediaService : MediaBrowserServiceCompat() {
 
         override fun updateMediaMetadata(
             mediaMetadata: MediaMetadataCompat,
-            nextSongInfo: CharSequence?
+            currentPosition: CharSequence?
         ) {
             mediaSession?.setMetadata(mediaMetadata)
-            mediaSession?.setQueueTitle(nextSongInfo)
+            mediaSession?.setQueueTitle(currentPosition)
         }
     }
 
     companion object {
         private const val TAG = "media_session"
-        private const val EMPTY_MEDIA_ROOT_ID = "empty_media_root_id"
+        private const val MEDIA_ROOT_ID = "empty_media_root_id"
     }
 }

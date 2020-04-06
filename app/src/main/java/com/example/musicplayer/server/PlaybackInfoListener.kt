@@ -9,5 +9,5 @@ interface PlaybackInfoListener {
 
     fun onProgressChanged(progress : Long)
 
-    fun updateMediaMetadata(mediaMetadata: MediaMetadataCompat, nextSongInfo: CharSequence?)
+    fun updateMediaMetadata(mediaMetadata: MediaMetadataCompat, currentPosition: CharSequence?)
 }
