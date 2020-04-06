@@ -65,7 +65,8 @@
     </androidx.constraintlayout.widget.ConstraintLayout>
 
 
-    <FrameLayout
+    <ImageView
+        android:id="@+id/imageViewIcon"
         android:layout_width="310dp"
         android:layout_height="310dp"
         android:layout_marginStart="24dp"
@@ -73,14 +74,8 @@
         android:background="@android:color/white"
         android:elevation="8dp"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent">
-
-        <ImageView
-            android:id="@+id/imageViewIcon"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            tools:srcCompat="@mipmap/ic_launcher" />
-    </FrameLayout>
+        app:layout_constraintTop_toTopOf="parent"
+        tools:srcCompat="@mipmap/ic_launcher" />
 
 
     <androidx.recyclerview.widget.RecyclerView
@@ -104,7 +99,7 @@
         app:layout_constraintBottom_toTopOf="@+id/recyclerView"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:srcCompat="@color/colorControl" />
+        app:srcCompat="@color/colorDefault" />
 
     <ImageView
         android:layout_width="0dp"
@@ -115,6 +110,17 @@
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:srcCompat="@color/colorControl" />
+        app:srcCompat="@color/colorDefault" />
+
+    <ImageView
+        android:layout_width="0dp"
+        android:layout_height="1dp"
+        android:layout_marginStart="24dp"
+        android:layout_marginEnd="24dp"
+        android:layout_marginBottom="12dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:srcCompat="@color/colorDefault" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

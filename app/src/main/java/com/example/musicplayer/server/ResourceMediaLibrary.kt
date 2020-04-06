@@ -4,7 +4,9 @@ import android.content.Context
 import android.graphics.BitmapFactory
 import android.media.MediaMetadataRetriever
 import android.net.Uri
+import android.os.Bundle
 import android.support.v4.media.MediaBrowserCompat
+import android.support.v4.media.MediaDescriptionCompat
 import android.support.v4.media.MediaMetadataCompat
 import com.example.musicplayer.R
 
@@ -23,11 +25,11 @@ object ResourceMediaLibrary {
         )
     }
 
-    fun getPlayListAsMediaMetadata(context: Context) : List<MediaMetadataCompat> {
+    fun getPlayListAsMediaMetadata(context: Context): List<MediaMetadataCompat> {
         val list = arrayListOf<MediaMetadataCompat>()
         playlist.forEach {
             list.add(
-                buildMediaMetadata(
+                buildMediaMetadataWithBitmap(
                     context,
                     it
                 )
@@ -36,16 +38,7 @@ object ResourceMediaLibrary {
         return list
     }
 
-    fun getPlayListAsMediaItem(context: Context) : MutableList<MediaBrowserCompat.MediaItem>{
-        val playListAsMediaItem = arrayListOf<MediaBrowserCompat.MediaItem>()
-        getPlayListAsMediaMetadata(context).forEach {
-            val mediaItem = MediaBrowserCompat.MediaItem(it.description, MediaBrowserCompat.MediaItem.FLAG_PLAYABLE)
-            playListAsMediaItem.add(mediaItem)
-        }
-        return playListAsMediaItem
-    }
-
-    private fun buildMediaMetadata(context: Context, track: Int): MediaMetadataCompat {
+    private fun buildMediaMetadataWithBitmap(context: Context, track: Int): MediaMetadataCompat {
         val retriever = MediaMetadataRetriever()
         val uri = Uri.parse("android.resource://${context.packageName}/$track")
         retriever.setDataSource(context, uri)
@@ -64,6 +57,56 @@ object ResourceMediaLibrary {
             .putString(MediaMetadataCompat.METADATA_KEY_ARTIST, artist)
             .putLong(MediaMetadataCompat.METADATA_KEY_DURATION, duration.toLong())
             .putBitmap(MediaMetadataCompat.METADATA_KEY_DISPLAY_ICON, icon)
+            .build()
+    }
+
+
+    fun getPlayListAsMediaItem(context: Context): MutableList<MediaBrowserCompat.MediaItem> {
+        val playListAsMediaItem = arrayListOf<MediaBrowserCompat.MediaItem>()
+        getPlayListAsMediaMetadataWithoutBitmap(context).forEach { metadata ->
+            val description = MediaDescriptionCompat.Builder()
+                .setMediaId(metadata.getString(MediaMetadataCompat.METADATA_KEY_MEDIA_ID))
+                .setTitle(
+                    "${metadata.getString(MediaMetadataCompat.METADATA_KEY_ARTIST)} - ${metadata.getString(
+                        MediaMetadataCompat.METADATA_KEY_ARTIST
+                    )}"
+                )
+                .setSubtitle(metadata.getLong(MediaMetadataCompat.METADATA_KEY_DURATION).toString())
+                .build()
+            val mediaItem = MediaBrowserCompat.MediaItem(
+                description,
+                MediaBrowserCompat.MediaItem.FLAG_PLAYABLE
+            )
+            playListAsMediaItem.add(mediaItem)
+        }
+        return playListAsMediaItem
+    }
+
+    private fun getPlayListAsMediaMetadataWithoutBitmap(context: Context): List<MediaMetadataCompat> {
+        val list = arrayListOf<MediaMetadataCompat>()
+        playlist.forEach {
+            list.add(
+                buildMediaMetadataWithoutBitmap(context, it)
+            )
+        }
+        return list
+    }
+
+    private fun buildMediaMetadataWithoutBitmap(context: Context, track: Int): MediaMetadataCompat {
+        val retriever = MediaMetadataRetriever()
+        val uri = Uri.parse("android.resource://${context.packageName}/$track")
+        retriever.setDataSource(context, uri)
+
+        val title = retriever.extractMetadata(MediaMetadataRetriever.METADATA_KEY_TITLE)
+        val artist = retriever.extractMetadata(MediaMetadataRetriever.METADATA_KEY_ARTIST)
+        val duration = retriever.extractMetadata(MediaMetadataRetriever.METADATA_KEY_DURATION)
+
+        return MediaMetadataCompat.Builder()
+            .putString(MediaMetadataCompat.METADATA_KEY_MEDIA_ID, track.toString())
+            .putString(MediaMetadataCompat.METADATA_KEY_MEDIA_URI, uri.toString())
+            .putString(MediaMetadataCompat.METADATA_KEY_TITLE, title)
+            .putString(MediaMetadataCompat.METADATA_KEY_ARTIST, artist)
+            .putLong(MediaMetadataCompat.METADATA_KEY_DURATION, duration.toLong())
             .build()
     }
 }

@@ -4,6 +4,6 @@
     <color name="colorPrimaryDark">#217883</color>
     <color name="colorAccent">#D81B60</color>
 
-    <color name="colorControl">#217883</color>
+    <color name="colorDefault">#217883</color>
     <color name="colorRipple">#217883</color>
 </resources>

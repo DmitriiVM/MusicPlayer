@@ -55,14 +55,14 @@ class RecyclerViewAdapter(
         private val onTrackClickListener: OnTrackClickListener
     ) : RecyclerView.ViewHolder(view) {
         fun onBind(mediaItem: MediaBrowserCompat.MediaItem, position: Int) {
-            view.textViewTrack.text =  "${mediaItem.description.subtitle} - ${mediaItem.description.title}"
+
+            val totalSeconds = mediaItem.description.subtitle.toString().toInt() / 1000
+            val minutes = totalSeconds / 60
+            val seconds = (totalSeconds - minutes * 60)
+            view.textViewTrack.text =  mediaItem.description.title
+            view.textViewDuration.text =  "$minutes:$seconds"
 
             view.setOnClickListener {
-
-//                notifyDataSetChanged()
-
-//                view.isSelected = true
-
                 onTrackClickListener.onTrackClick(position)
             }
         }
