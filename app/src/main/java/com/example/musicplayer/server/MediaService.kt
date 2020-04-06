@@ -75,6 +75,10 @@ class MediaService : MediaBrowserServiceCompat() {
         override fun onPrepare() {
             musicPlayer.onPrepare()
         }
+
+        override fun onSeekTo(pos: Long) {
+            musicPlayer.seekTo(pos)
+        }
     }
 
     private val playbackInfoListener = object :

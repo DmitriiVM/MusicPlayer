@@ -3,6 +3,8 @@ package com.example.musicplayer.client
 import android.os.Bundle
 import android.support.v4.media.MediaMetadataCompat
 import android.support.v4.media.session.PlaybackStateCompat
+import android.util.Log
+import android.widget.SeekBar
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
@@ -27,6 +29,18 @@ class MainActivity : AppCompatActivity() {
         imageViewSkipToPrevious.setOnClickListener {
             mediaBrowserViewModel.getTransportControls().skipToPrevious()
         }
+        seekBar.setOnSeekBarChangeListener(object : SeekBar.OnSeekBarChangeListener{
+            override fun onProgressChanged(seekBar: SeekBar?, progress: Int, fromUser: Boolean) {
+                if (fromUser) {
+                    mediaBrowserViewModel.getTransportControls().seekTo(progress.toLong())
+                }
+            }
+
+            override fun onStartTrackingTouch(seekBar: SeekBar?) { }
+
+            override fun onStopTrackingTouch(seekBar: SeekBar?) { }
+
+        })
         subscribeObservers()
     }
 
@@ -37,13 +51,13 @@ class MainActivity : AppCompatActivity() {
             textViewSong.text = metadata.getString(MediaMetadataCompat.METADATA_KEY_TITLE)
             imageViewIcon.setImageBitmap(metadata.getBitmap(MediaMetadataCompat.METADATA_KEY_DISPLAY_ICON))
             val duration = metadata.getLong(MediaMetadataCompat.METADATA_KEY_DURATION)
-            progressBar.max = duration.toInt()
+            seekBar.max = duration.toInt()
         })
         mediaBrowserViewModel.nextSongLiveData.observe(this, Observer {
             textViewNextTrack.text = getString(R.string.next_track, it)
         })
         mediaBrowserViewModel.progressLiveData.observe(this, Observer {
-            progressBar.progress = it
+            seekBar.progress = it
         })
         mediaBrowserViewModel.playbackStateLiveData.observe(this, Observer { state ->
             when (state.state) {

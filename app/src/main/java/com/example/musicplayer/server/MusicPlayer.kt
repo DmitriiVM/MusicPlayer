@@ -97,6 +97,10 @@ class MusicPlayer(private val service: MediaBrowserServiceCompat) {
         exoPlayer.previous()
     }
 
+    fun seekTo(pos: Long){
+        exoPlayer.seekTo(pos)
+    }
+
     fun onPrepare() {
         updateMediaMetadata()
         playbackState?.let {

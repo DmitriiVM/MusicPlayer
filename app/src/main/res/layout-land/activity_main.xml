@@ -40,9 +40,8 @@
         app:layout_constraintTop_toTopOf="@+id/imageViewPlayPause"
         app:srcCompat="@drawable/ic_skip_previous_black_24dp" />
 
-    <ProgressBar
-        android:id="@+id/progressBar"
-        style="?android:attr/progressBarStyleHorizontal"
+    <SeekBar
+        android:id="@+id/seekBar"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginStart="16dp"
@@ -71,13 +70,12 @@
         android:id="@+id/textViewNextTrack"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginBottom="24dp"
         android:drawableStart="@drawable/ic_audiotrack_black_24dp"
         android:drawablePadding="4dp"
         android:textSize="12sp"
-        app:layout_constraintBottom_toTopOf="@+id/progressBar"
+        app:layout_constraintBottom_toTopOf="@+id/seekBar"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="@+id/guideline2"/>
+        app:layout_constraintStart_toStartOf="@+id/guideline2" />
 
     <TextView
         android:id="@+id/textViewArtist"
