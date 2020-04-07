@@ -33,7 +33,6 @@ class MusicPlayer(private val service: MediaBrowserServiceCompat) {
     private var playList = listOf<MediaMetadataCompat>()
     private var playbackInfoListener: PlaybackInfoListener? = null
     private var playbackState: PlaybackStateCompat? = null
-    var job: Job? = null
     private val context = service.applicationContext
 
     fun initializePlayer(
@@ -164,12 +163,10 @@ class MusicPlayer(private val service: MediaBrowserServiceCompat) {
         }
 
         private fun startTrackingPlayback() {
-            job = CoroutineScope(Dispatchers.IO).launch {
-                while (true) {
-                    withContext(Dispatchers.Main) {
-                        if (!exoPlayer.isPlaying) cancel()
-                        playbackInfoListener?.onProgressChanged(exoPlayer.contentPosition)
-                    }
+            MainScope().launch {
+                while (true){
+                    if (!exoPlayer.isPlaying) cancel()
+                    playbackInfoListener?.onProgressChanged(exoPlayer.contentPosition)
                     delay(200)
                 }
             }

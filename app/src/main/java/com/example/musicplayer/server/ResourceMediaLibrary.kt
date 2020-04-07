@@ -11,19 +11,14 @@ import com.example.musicplayer.R
 
 object ResourceMediaLibrary {
 
-    private var playlist = arrayListOf<Int>()
-
-    init {
-        playlist = arrayListOf(
-            R.raw.gorillaz_on_melancholy_hill,
-            R.raw.thekillers,
-            R.raw.bullet,
-            R.raw.fratellis_baby_dont_you_lie_to_me
+    private var playlist = arrayListOf(
+        R.raw.gorillaz_on_melancholy_hill,
+        R.raw.thekillers,
+        R.raw.bullet,
+        R.raw.fratellis_baby_dont_you_lie_to_me
 //            R.raw.hiding_in_my_headphones
 //            R.raw.jet
-        )
-    }
-
+    )
     fun getPlayListAsMediaMetadata(context: Context): List<MediaMetadataCompat> {
         val list = arrayListOf<MediaMetadataCompat>()
         playlist.forEach {
