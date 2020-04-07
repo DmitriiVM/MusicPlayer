@@ -47,11 +47,7 @@ class MusicPlayer(private val service: MediaBrowserServiceCompat) {
 
         exoPlayer = ExoPlayerFactory.newSimpleInstance(context)
         exoPlayer.setAudioAttributes(AudioAttributes.DEFAULT, true)
-
-//        val notificationManager = buildNotificationManager()
-//        notificationManager.setPlayer(exoPlayer)
         exoPlayer.addListener(exoPlayerEventListener)
-
         val concatenatingMediaSource = buildMediaSource(playList)
         exoPlayer.prepare(concatenatingMediaSource, false, false)
     }
@@ -105,7 +101,11 @@ class MusicPlayer(private val service: MediaBrowserServiceCompat) {
     }
 
     fun skipToPrevious() {
-        exoPlayer.previous()
+        if (exoPlayer.currentWindowIndex == 0) {
+            exoPlayer.seekTo(0)
+        } else {
+            exoPlayer.previous()
+        }
     }
 
     fun seekTo(pos: Long) {
