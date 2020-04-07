@@ -9,10 +9,12 @@ import android.media.session.PlaybackState
 import android.os.SystemClock
 import android.support.v4.media.MediaMetadataCompat
 import android.support.v4.media.session.PlaybackStateCompat
+import android.util.Log
 import androidx.core.content.ContextCompat
 import androidx.media.MediaBrowserServiceCompat
 import com.example.musicplayer.R
 import com.example.musicplayer.client.MainActivity
+import com.google.android.exoplayer2.ControlDispatcher
 import com.google.android.exoplayer2.ExoPlayerFactory
 import com.google.android.exoplayer2.Player
 import com.google.android.exoplayer2.SimpleExoPlayer
@@ -34,6 +36,7 @@ class MusicPlayer(private val service: MediaBrowserServiceCompat) {
     private var playbackInfoListener: PlaybackInfoListener? = null
     private var playbackState: PlaybackStateCompat? = null
     private val context = service.applicationContext
+    private var isNotificationManagerSet = false
 
     fun initializePlayer(
         playList: List<MediaMetadataCompat>,
@@ -45,8 +48,8 @@ class MusicPlayer(private val service: MediaBrowserServiceCompat) {
         exoPlayer = ExoPlayerFactory.newSimpleInstance(context)
         exoPlayer.setAudioAttributes(AudioAttributes.DEFAULT, true)
 
-        val notificationManager = buildNotificationManager()
-        notificationManager.setPlayer(exoPlayer)
+//        val notificationManager = buildNotificationManager()
+//        notificationManager.setPlayer(exoPlayer)
         exoPlayer.addListener(exoPlayerEventListener)
 
         val concatenatingMediaSource = buildMediaSource(playList)
@@ -68,6 +71,14 @@ class MusicPlayer(private val service: MediaBrowserServiceCompat) {
         return concatenatingMediaSource
     }
 
+    private fun setNotificationManager(){
+        if (!isNotificationManagerSet) {
+            val notificationManager = buildNotificationManager()
+            notificationManager.setPlayer(exoPlayer)
+            isNotificationManagerSet = true
+        }
+    }
+
     private fun buildNotificationManager(): PlayerNotificationManager {
         return PlayerNotificationManager.createWithNotificationChannel(
             context,
@@ -82,6 +93,7 @@ class MusicPlayer(private val service: MediaBrowserServiceCompat) {
 
     fun play() {
         exoPlayer.playWhenReady = true
+        setNotificationManager()
     }
 
     fun pause() {
@@ -103,6 +115,7 @@ class MusicPlayer(private val service: MediaBrowserServiceCompat) {
     fun playSelectedTrack(position: Int) {
         exoPlayer.playWhenReady = true
         exoPlayer.seekTo(position, 0)
+        setNotificationManager()
     }
 
     fun onPrepare() {
