@@ -19,6 +19,7 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.musicplayer.*
 import kotlinx.android.synthetic.main.activity_main.*
+import kotlinx.android.synthetic.main.playback_info.*
 
 class MainActivity : AppCompatActivity(), RecyclerViewAdapter.OnTrackClickListener {
 
@@ -62,7 +63,6 @@ class MainActivity : AppCompatActivity(), RecyclerViewAdapter.OnTrackClickListen
     private fun subscribeObservers() {
 
         mediaBrowserViewModel.metadataLiveData.observe(this, Observer { metadata ->
-//            imageViewIcon1.setImageBitmap(metadata.getBitmap(MediaMetadataCompat.METADATA_KEY_DISPLAY_ICON))
             val duration = metadata.getLong(MediaMetadataCompat.METADATA_KEY_DURATION)
             seekBar.max = duration.toInt()
 
@@ -82,7 +82,6 @@ class MainActivity : AppCompatActivity(), RecyclerViewAdapter.OnTrackClickListen
 
         })
         mediaBrowserViewModel.currentPositionLiveData.observe(this, Observer {
-            Log.d("mmm", "MainActivity :  subscribeObservers --  ")
             adapter.selectItem(it.toString().toInt())
         })
         mediaBrowserViewModel.progressLiveData.observe(this, Observer {
@@ -95,56 +94,24 @@ class MainActivity : AppCompatActivity(), RecyclerViewAdapter.OnTrackClickListen
                     imageViewPlayPause.setOnClickListener {
                         mediaBrowserViewModel.getTransportControls().pause()
                     }
-//                    val rotate = ObjectAnimator.ofFloat(imageViewPlayPause, "rotation", 0f, 360f)
-//                    rotate.duration = 1000
-//                    rotate.start()
+
                     imageViewPlayPause.rotate()
-
-                    val animation1 = ObjectAnimator.ofFloat(imageViewSkipToNext, "translationY", 20f)
-                    animation1.duration = 500
-                    animation1.repeatCount = 1
-                    animation1.repeatMode = ValueAnimator.REVERSE
-                    animation1.start()
-//                    imageViewSkipToNext.translateArrowButton(150f)
-
-                    val animation2 = ObjectAnimator.ofFloat(imageViewSkipToPrevious, "translationY", -20f)
-                    animation2.duration = 500
-                    animation2.repeatCount = 1
-                    animation2.repeatMode = ValueAnimator.REVERSE
-                    animation2.start()
-//                    imageViewSkipToPrevious.translateArrowButton(-150f)
+                    imageViewSkipToNext.translateArrowButton(20f)
+                    imageViewSkipToPrevious.translateArrowButton(-20f)
                 }
                 PlaybackStateCompat.STATE_PAUSED -> {
                     imageViewPlayPause.setImageResource(R.drawable.ic_play_circle_outline_black_24dp)
                     imageViewPlayPause.setOnClickListener {
                         mediaBrowserViewModel.getTransportControls().play()
                     }
-//                    val rotate = ObjectAnimator.ofFloat(imageViewPlayPause, "rotation", 0f, 360f)
-//                    rotate.duration = 1000
-//                    rotate.start()
+
                     imageViewPlayPause.rotate()
-
-                    val animation = ObjectAnimator.ofFloat(imageViewSkipToNext, "translationY", 20f)
-                    animation.duration = 500
-                    animation.repeatCount = 1
-                    animation.repeatMode = ValueAnimator.REVERSE
-                    animation.start()
-//                    imageViewSkipToNext.translateArrowButton(150f)
-
-                    val animation2 = ObjectAnimator.ofFloat(imageViewSkipToPrevious, "translationY", -20f)
-                    animation2.duration = 500
-                    animation2.repeatCount = 1
-                    animation2.repeatMode = ValueAnimator.REVERSE
-                    animation2.start()
-//                    imageViewSkipToPrevious.translateArrowButton(-150f)
+                    imageViewSkipToNext.translateArrowButton(20f)
+                    imageViewSkipToPrevious.translateArrowButton(-20f)
                 }
             }
         })
         mediaBrowserViewModel.playListLiveData.observe(this, Observer {
-//            val list = arrayListOf<String>()
-//            it.forEach { mediaItem ->
-//                list.add("${mediaItem.description.subtitle} - ${mediaItem.description.title}")
-//            }
             recyclerView.layoutManager = LinearLayoutManager(this)
             recyclerView.adapter = adapter
             adapter.setPlayList(it)

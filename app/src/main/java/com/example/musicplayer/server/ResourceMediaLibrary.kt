@@ -4,7 +4,6 @@ import android.content.Context
 import android.graphics.BitmapFactory
 import android.media.MediaMetadataRetriever
 import android.net.Uri
-import android.os.Bundle
 import android.support.v4.media.MediaBrowserCompat
 import android.support.v4.media.MediaDescriptionCompat
 import android.support.v4.media.MediaMetadataCompat
@@ -68,7 +67,7 @@ object ResourceMediaLibrary {
                 .setMediaId(metadata.getString(MediaMetadataCompat.METADATA_KEY_MEDIA_ID))
                 .setTitle(
                     "${metadata.getString(MediaMetadataCompat.METADATA_KEY_ARTIST)} - ${metadata.getString(
-                        MediaMetadataCompat.METADATA_KEY_ARTIST
+                        MediaMetadataCompat.METADATA_KEY_TITLE
                     )}"
                 )
                 .setSubtitle(metadata.getLong(MediaMetadataCompat.METADATA_KEY_DURATION).toString())

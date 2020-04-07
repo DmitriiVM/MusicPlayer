@@ -7,101 +7,22 @@
     android:background="#E0EFF3"
     tools:context=".client.MainActivity">
 
-    <androidx.constraintlayout.widget.ConstraintLayout
-        android:id="@+id/constraintLayout"
-        android:layout_width="310dp"
-        android:layout_height="310dp"
-        android:layout_marginTop="60dp"
-        android:layout_marginEnd="24dp"
-        android:background="@android:color/white"
-        android:elevation="4dp"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toTopOf="parent">
-
-        <ImageView
-            android:id="@+id/imageViewPlayPause"
-            android:layout_width="50dp"
-            android:layout_height="50dp"
-            android:layout_marginEnd="2dp"
-            android:background="?selectableItemBackgroundBorderless"
-            app:layout_constraintBottom_toTopOf="@+id/seekBar"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toTopOf="parent"
-            app:srcCompat="@drawable/ic_play_circle_outline_black_24dp" />
-
-        <ImageView
-            android:id="@+id/imageViewSkipToPrevious"
-            android:layout_width="50dp"
-            android:layout_height="50dp"
-            android:layout_marginBottom="8dp"
-            android:background="?selectableItemBackgroundBorderless"
-            app:layout_constraintBottom_toTopOf="@+id/imageViewPlayPause"
-            app:layout_constraintEnd_toEndOf="@+id/imageViewPlayPause"
-            app:layout_constraintHorizontal_bias="0.0"
-            app:layout_constraintStart_toStartOf="@+id/imageViewPlayPause"
-            app:srcCompat="@drawable/ic_keyboard_arrow_up_black_24dp" />
-
-        <ImageView
-            android:id="@+id/imageViewSkipToNext"
-            android:layout_width="50dp"
-            android:layout_height="50dp"
-            android:layout_marginTop="8dp"
-            android:background="?selectableItemBackgroundBorderless"
-            app:layout_constraintEnd_toEndOf="@+id/imageViewPlayPause"
-            app:layout_constraintHorizontal_bias="0.5"
-            app:layout_constraintStart_toStartOf="@+id/imageViewPlayPause"
-            app:layout_constraintTop_toBottomOf="@+id/imageViewPlayPause"
-            app:srcCompat="@drawable/ic_keyboard_arrow_down_black_24dp" />
-
-        <SeekBar
-            android:id="@+id/seekBar"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_marginBottom="8dp"
-            android:background="?selectableItemBackgroundBorderless"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent" />
-    </androidx.constraintlayout.widget.ConstraintLayout>
-
-
-    <ImageView
-        android:id="@+id/imageViewIcon1"
-        android:layout_width="310dp"
-        android:layout_height="310dp"
-        android:layout_marginStart="24dp"
-        android:layout_marginTop="24dp"
-        android:background="@android:color/white"
-        android:elevation="8dp"
-        android:visibility="gone"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        tools:srcCompat="@mipmap/ic_launcher" />
-
-    <ImageView
-        android:id="@+id/imageViewIcon2"
-        android:layout_width="310dp"
-        android:layout_height="310dp"
-        android:layout_marginStart="24dp"
-        android:layout_marginTop="24dp"
-        android:background="@android:color/white"
-        android:elevation="8dp"
-        android:visibility="gone"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        tools:srcCompat="@mipmap/ic_launcher" />
-
+    <include
+        android:id="@+id/include2"
+        layout="@layout/playback_info"
+        app:layout_constraintDimensionRatio="H,1:1" />
 
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/recyclerView"
         android:layout_width="0dp"
         android:layout_height="0dp"
-        android:layout_marginTop="24dp"
+        android:layout_marginStart="18dp"
+        android:layout_marginEnd="24dp"
         android:layout_marginBottom="16dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/constraintLayout" />
+        app:layout_constraintTop_toBottomOf="@+id/include2" />
 
     <ImageView
         android:id="@+id/imageView"

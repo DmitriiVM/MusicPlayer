@@ -26,6 +26,7 @@ fun ImageView.translateToLeft(){
         override fun onAnimationRepeat(animation: Animation?) {}
         override fun onAnimationEnd(animation: Animation?) {
             visibility = View.INVISIBLE
+            setImageDrawable(null)
         }
         override fun onAnimationStart(animation: Animation?) {
         }

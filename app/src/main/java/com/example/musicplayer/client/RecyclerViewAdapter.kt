@@ -59,8 +59,8 @@ class RecyclerViewAdapter(
             val totalSeconds = mediaItem.description.subtitle.toString().toInt() / 1000
             val minutes = totalSeconds / 60
             val seconds = (totalSeconds - minutes * 60)
-            view.textViewTrack.text =  mediaItem.description.title
             view.textViewDuration.text =  "$minutes:$seconds"
+            view.textViewTrack.text =  mediaItem.description.title
 
             view.setOnClickListener {
                 onTrackClickListener.onTrackClick(position)
