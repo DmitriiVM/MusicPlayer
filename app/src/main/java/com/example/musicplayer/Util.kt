@@ -2,17 +2,14 @@ package com.example.musicplayer
 
 import android.animation.ObjectAnimator
 import android.animation.ValueAnimator
-import android.graphics.Bitmap
 import android.view.View
 import android.view.animation.Animation
 import android.view.animation.ScaleAnimation
 import android.view.animation.TranslateAnimation
 import android.widget.ImageView
-import kotlinx.android.synthetic.main.activity_main.*
 
 
-fun ImageView.scaleFromZero(icon : Bitmap){
-    setImageBitmap(icon)
+fun ImageView.scaleFromZero(){
     val scale = ScaleAnimation(0f, 1f, 0f, 1f, 500f, 400f)
     scale.duration = 500
     scale.startOffset = 100

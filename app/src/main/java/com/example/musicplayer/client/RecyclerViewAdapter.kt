@@ -22,7 +22,6 @@ class RecyclerViewAdapter(
     }
 
     fun selectItem(position: Int){
-        Log.d("mmm", "RecyclerViewAdapter :  selectItem --  ")
         notifyItemChanged(selectedItem)
         selectedItem = position
         notifyItemChanged(selectedItem)

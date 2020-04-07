@@ -1,17 +1,10 @@
 package com.example.musicplayer.client
 
-import android.animation.ObjectAnimator
-import android.animation.ValueAnimator
-import android.graphics.Bitmap
 import android.os.Bundle
 import android.support.v4.media.MediaMetadataCompat
 import android.support.v4.media.session.PlaybackStateCompat
 import android.util.Log
 import android.view.View
-import android.view.animation.Animation
-import android.view.animation.ScaleAnimation
-import android.view.animation.TranslateAnimation
-import android.widget.ImageView
 import android.widget.SeekBar
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.Observer
@@ -26,10 +19,13 @@ class MainActivity : AppCompatActivity(), RecyclerViewAdapter.OnTrackClickListen
     private lateinit var mediaBrowserViewModel: MediaBrowserViewModel
     private lateinit var adapter : RecyclerViewAdapter
     private var isFirstIcon = true
+    private var showAnimation = true
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
+
+        if (savedInstanceState != null) showAnimation = false
 
         adapter = RecyclerViewAdapter(this)
 
@@ -66,18 +62,53 @@ class MainActivity : AppCompatActivity(), RecyclerViewAdapter.OnTrackClickListen
             val duration = metadata.getLong(MediaMetadataCompat.METADATA_KEY_DURATION)
             seekBar.max = duration.toInt()
 
+            Log.d("mmm", "MainActivity :  showAnimation --  $showAnimation")
 
             val icon = metadata.getBitmap(MediaMetadataCompat.METADATA_KEY_DISPLAY_ICON)
             if (isFirstIcon) {
+                imageViewIcon1.setImageBitmap(icon)
                 imageViewIcon1.visibility = View.VISIBLE
-                imageViewIcon1.scaleFromZero(icon)
-                imageViewIcon2.translateToLeft()
+
+                if (showAnimation) {
+
+                    Log.d("mmm", "MainActivity :  subscribeObservers --  1")
+                    imageViewIcon1.scaleFromZero()
+                    imageViewIcon2.translateToLeft()
+
+
+
+
+                }
+                else {
+                    showAnimation = true
+//                    imageViewIcon2.visibility = View.GONE
+                }
+
                 isFirstIcon = false
+
+
             } else {
+                imageViewIcon2.setImageBitmap(icon)
                 imageViewIcon2.visibility = View.VISIBLE
-                imageViewIcon2.scaleFromZero(icon)
-                imageViewIcon1.translateToLeft()
+
+
+                if (showAnimation)
+                {
+
+                    Log.d("mmm", "MainActivity :  subscribeObservers --  2")
+                    imageViewIcon2.scaleFromZero()
+                    imageViewIcon1.translateToLeft()
+
+
+
+                }
+                else {
+                    showAnimation = true
+//                    imageViewIcon1.visibility = View.GONE
+                }
+
                 isFirstIcon = true
+
             }
 
         })

@@ -36,6 +36,7 @@ class MusicPlayer(private val service: MediaBrowserServiceCompat) {
     private var playbackState: PlaybackStateCompat? = null
     var job: Job? = null
     private val context = service.applicationContext
+    private var isFirstLoad = true
 
     fun initializePlayer(
         playList: List<MediaMetadataCompat>,
@@ -98,22 +99,24 @@ class MusicPlayer(private val service: MediaBrowserServiceCompat) {
         exoPlayer.previous()
     }
 
-    fun seekTo(pos: Long){
+    fun seekTo(pos: Long) {
         exoPlayer.seekTo(pos)
     }
 
-    fun playSelectedTrack(position: Int){
+    fun playSelectedTrack(position: Int) {
         exoPlayer.playWhenReady = true
         exoPlayer.seekTo(position, 0)
     }
 
     fun onPrepare() {
-        updateMediaMetadata()
-        Log.d("mmm", "MusicPlayer :  onPrepare --  ")
-        playbackState?.let {
-            playbackInfoListener?.onPlaybackStateChange(it)
+        if (isFirstLoad) {
+            updateMediaMetadata()
+            playbackState?.let {
+                playbackInfoListener?.onPlaybackStateChange(it)
+            }
+            playbackInfoListener?.onProgressChanged(exoPlayer.contentPosition)
+            isFirstLoad = false
         }
-        playbackInfoListener?.onProgressChanged(exoPlayer.contentPosition)
     }
 
     fun releasePlayer() {
@@ -123,9 +126,11 @@ class MusicPlayer(private val service: MediaBrowserServiceCompat) {
     @SuppressLint("WrongConstant")
     private fun setState(state: Int) {
         playbackState = PlaybackStateCompat.Builder()
-            .setActions(PlaybackState.ACTION_PLAY_PAUSE
+            .setActions(
+                PlaybackState.ACTION_PLAY_PAUSE
                         or PlaybackState.ACTION_SKIP_TO_NEXT
-                        or PlaybackState.ACTION_SKIP_TO_PREVIOUS)
+                        or PlaybackState.ACTION_SKIP_TO_PREVIOUS
+            )
             .setState(state, 0, 1.0f, SystemClock.elapsedRealtime())
             .build()
         playbackState?.let {
@@ -147,7 +152,6 @@ class MusicPlayer(private val service: MediaBrowserServiceCompat) {
             } else {
                 isClickHandled = true
             }
-            Log.d("mmm", "MusicPlayer :  onTracksChanged --  ")
 
         }
 
@@ -177,8 +181,6 @@ class MusicPlayer(private val service: MediaBrowserServiceCompat) {
         }
 
         override fun onLoadingChanged(isLoading: Boolean) {
-//            updateMediaMetadata()
-//            Log.d("mmm", "MusicPlayer :  onLoadingChanged --  ")
             if (exoPlayer.playWhenReady) return
             setState(PlaybackStateCompat.STATE_PAUSED)
         }
@@ -188,7 +190,10 @@ class MusicPlayer(private val service: MediaBrowserServiceCompat) {
         val currentPosition = exoPlayer.currentWindowIndex
         val currentTrackMediaMetadata = playList[currentPosition]
 
-        playbackInfoListener?.updateMediaMetadata(currentTrackMediaMetadata, currentPosition.toString())
+        playbackInfoListener?.updateMediaMetadata(
+            currentTrackMediaMetadata,
+            currentPosition.toString()
+        )
     }
 
 
