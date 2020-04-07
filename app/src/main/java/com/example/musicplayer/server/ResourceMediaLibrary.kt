@@ -19,22 +19,18 @@ object ResourceMediaLibrary {
         R.raw.weezer_island,
         R.raw.fratellis_baby_dont_you_lie_to_me
     )
-    fun getPlayListAsMediaMetadata(context: Context): List<MediaMetadataCompat> {
-        val list = arrayListOf<MediaMetadataCompat>()
-        playlist.forEach {
-            list.add(
-                buildMediaMetadataWithBitmap(
-                    context,
-                    it
-                )
-            )
+
+    fun getPlayListAsMediaMetadata(context: Context) =
+        arrayListOf<MediaMetadataCompat>().apply {
+            playlist.forEach {
+                this.add(buildMediaMetadataWithBitmap(context, it))
+            }
         }
-        return list
-    }
 
     private fun buildMediaMetadataWithBitmap(context: Context, track: Int): MediaMetadataCompat {
         val retriever = MediaMetadataRetriever()
-        val uri = Uri.parse("android.resource://${context.packageName}/$track")
+        val uri =
+            Uri.parse(context.getString(R.string.track_uri, context.packageName, track.toString()))
         retriever.setDataSource(context, uri)
 
         val iconByteArray: ByteArray
@@ -55,40 +51,38 @@ object ResourceMediaLibrary {
     }
 
 
-    fun getPlayListAsMediaItem(context: Context): MutableList<MediaBrowserCompat.MediaItem> {
-        val playListAsMediaItem = arrayListOf<MediaBrowserCompat.MediaItem>()
-        getPlayListAsMediaMetadataWithoutBitmap(context).forEach { metadata ->
-            val description = MediaDescriptionCompat.Builder()
-                .setMediaId(metadata.getString(MediaMetadataCompat.METADATA_KEY_MEDIA_ID))
-                .setTitle(
-                    "${metadata.getString(MediaMetadataCompat.METADATA_KEY_ARTIST)} - ${metadata.getString(
-                        MediaMetadataCompat.METADATA_KEY_TITLE
-                    )}"
+    fun getPlayListAsMediaItem(context: Context): MutableList<MediaBrowserCompat.MediaItem> =
+        arrayListOf<MediaBrowserCompat.MediaItem>().apply {
+            getPlayListAsMediaMetadataWithoutBitmap(context).forEach { metadata ->
+                val description = MediaDescriptionCompat.Builder()
+                    .setMediaId(metadata.getString(MediaMetadataCompat.METADATA_KEY_MEDIA_ID))
+                    .setTitle(
+                        context.getString(
+                            R.string.song_title,
+                            metadata.getString(MediaMetadataCompat.METADATA_KEY_ARTIST),
+                            metadata.getString(MediaMetadataCompat.METADATA_KEY_TITLE)
+                        )
+                    )
+                    .setSubtitle(metadata.getLong(MediaMetadataCompat.METADATA_KEY_DURATION).toString())
+                    .build()
+                val mediaItem = MediaBrowserCompat.MediaItem(
+                    description, MediaBrowserCompat.MediaItem.FLAG_PLAYABLE
                 )
-                .setSubtitle(metadata.getLong(MediaMetadataCompat.METADATA_KEY_DURATION).toString())
-                .build()
-            val mediaItem = MediaBrowserCompat.MediaItem(
-                description,
-                MediaBrowserCompat.MediaItem.FLAG_PLAYABLE
-            )
-            playListAsMediaItem.add(mediaItem)
+                this.add(mediaItem)
+            }
         }
-        return playListAsMediaItem
-    }
 
-    private fun getPlayListAsMediaMetadataWithoutBitmap(context: Context): List<MediaMetadataCompat> {
-        val list = arrayListOf<MediaMetadataCompat>()
-        playlist.forEach {
-            list.add(
-                buildMediaMetadataWithoutBitmap(context, it)
-            )
+    private fun getPlayListAsMediaMetadataWithoutBitmap(context: Context) =
+        arrayListOf<MediaMetadataCompat>().apply {
+            playlist.forEach {
+                this.add(buildMediaMetadataWithoutBitmap(context, it))
+            }
         }
-        return list
-    }
 
     private fun buildMediaMetadataWithoutBitmap(context: Context, track: Int): MediaMetadataCompat {
         val retriever = MediaMetadataRetriever()
-        val uri = Uri.parse("android.resource://${context.packageName}/$track")
+        val uri =
+            Uri.parse(context.getString(R.string.track_uri, context.packageName, track.toString()))
         retriever.setDataSource(context, uri)
 
         val title = retriever.extractMetadata(MediaMetadataRetriever.METADATA_KEY_TITLE)

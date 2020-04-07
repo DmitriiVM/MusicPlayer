@@ -1,7 +1,6 @@
 package com.example.musicplayer.client
 
 import android.support.v4.media.MediaBrowserCompat
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -13,15 +12,15 @@ class RecyclerViewAdapter(
     private val onTrackClickListener: OnTrackClickListener
 ) : RecyclerView.Adapter<RecyclerViewAdapter.MusicPlayerHolder>() {
 
-    private var playList =  listOf<MediaBrowserCompat.MediaItem>()
+    private var playList = listOf<MediaBrowserCompat.MediaItem>()
     private var selectedItem = 0
 
-    fun setPlayList(playList : List<MediaBrowserCompat.MediaItem>){
+    fun setPlayList(playList: List<MediaBrowserCompat.MediaItem>) {
         this.playList = playList
         notifyDataSetChanged()
     }
 
-    fun selectItem(position: Int){
+    fun selectItem(position: Int) {
         notifyItemChanged(selectedItem)
         selectedItem = position
         notifyItemChanged(selectedItem)
@@ -34,18 +33,14 @@ class RecyclerViewAdapter(
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int) =
         MusicPlayerHolder(
             LayoutInflater.from(parent.context).inflate(
-                R.layout.track_item,
-                parent,
-                false
+                R.layout.track_item, parent, false
             ), onTrackClickListener
         )
 
     override fun getItemCount() = playList.size
 
     override fun onBindViewHolder(holder: MusicPlayerHolder, position: Int) {
-
         holder.itemView.isSelected = selectedItem == position
-
         holder.onBind(playList[position], position)
     }
 
@@ -58,8 +53,9 @@ class RecyclerViewAdapter(
             val totalSeconds = mediaItem.description.subtitle.toString().toInt() / 1000
             val minutes = totalSeconds / 60
             val seconds = (totalSeconds - minutes * 60)
-            view.textViewDuration.text =  "$minutes:$seconds"
-            view.textViewTrack.text =  mediaItem.description.title
+            view.textViewDuration.text =
+                view.context.getString(R.string.track_duration, minutes, seconds)
+            view.textViewTrack.text = mediaItem.description.title
 
             view.setOnClickListener {
                 onTrackClickListener.onTrackClick(position)

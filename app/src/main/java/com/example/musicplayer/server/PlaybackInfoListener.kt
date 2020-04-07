@@ -5,9 +5,9 @@ import android.support.v4.media.session.PlaybackStateCompat
 
 interface PlaybackInfoListener {
 
-    fun onPlaybackStateChange(state : PlaybackStateCompat)
+    fun onPlaybackStateChange(state: PlaybackStateCompat)
 
-    fun onProgressChanged(progress : Long)
+    fun onProgressChanged(progress: Long)
 
     fun updateMediaMetadata(mediaMetadata: MediaMetadataCompat, currentPosition: CharSequence?)
 }

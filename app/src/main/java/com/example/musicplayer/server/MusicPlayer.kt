@@ -9,12 +9,10 @@ import android.media.session.PlaybackState
 import android.os.SystemClock
 import android.support.v4.media.MediaMetadataCompat
 import android.support.v4.media.session.PlaybackStateCompat
-import android.util.Log
 import androidx.core.content.ContextCompat
 import androidx.media.MediaBrowserServiceCompat
 import com.example.musicplayer.R
 import com.example.musicplayer.client.MainActivity
-import com.google.android.exoplayer2.ControlDispatcher
 import com.google.android.exoplayer2.ExoPlayerFactory
 import com.google.android.exoplayer2.Player
 import com.google.android.exoplayer2.SimpleExoPlayer
@@ -27,7 +25,10 @@ import com.google.android.exoplayer2.ui.PlayerNotificationManager
 import com.google.android.exoplayer2.upstream.DefaultDataSourceFactory
 import com.google.android.exoplayer2.upstream.RawResourceDataSource
 import com.google.android.exoplayer2.util.Util
-import kotlinx.coroutines.*
+import kotlinx.coroutines.MainScope
+import kotlinx.coroutines.cancel
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 
 class MusicPlayer(private val service: MediaBrowserServiceCompat) {
 
@@ -39,8 +40,7 @@ class MusicPlayer(private val service: MediaBrowserServiceCompat) {
     private var isNotificationManagerSet = false
 
     fun initializePlayer(
-        playList: List<MediaMetadataCompat>,
-        playbackInfoListener: PlaybackInfoListener
+        playList: List<MediaMetadataCompat>, playbackInfoListener: PlaybackInfoListener
     ) {
         this.playbackInfoListener = playbackInfoListener
         this.playList = playList
@@ -67,7 +67,7 @@ class MusicPlayer(private val service: MediaBrowserServiceCompat) {
         return concatenatingMediaSource
     }
 
-    private fun setNotificationManager(){
+    private fun setNotificationManager() {
         if (!isNotificationManagerSet) {
             val notificationManager = buildNotificationManager()
             notificationManager.setPlayer(exoPlayer)
@@ -177,7 +177,7 @@ class MusicPlayer(private val service: MediaBrowserServiceCompat) {
 
         private fun startTrackingPlayback() {
             MainScope().launch {
-                while (true){
+                while (true) {
                     if (!exoPlayer.isPlaying) cancel()
                     playbackInfoListener?.onProgressChanged(exoPlayer.contentPosition)
                     delay(200)

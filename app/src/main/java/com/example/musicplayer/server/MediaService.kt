@@ -7,7 +7,6 @@ import android.support.v4.media.MediaBrowserCompat
 import android.support.v4.media.MediaMetadataCompat
 import android.support.v4.media.session.MediaSessionCompat
 import android.support.v4.media.session.PlaybackStateCompat
-import android.util.Log
 import androidx.media.MediaBrowserServiceCompat
 
 class MediaService : MediaBrowserServiceCompat() {
@@ -19,9 +18,7 @@ class MediaService : MediaBrowserServiceCompat() {
         super.onCreate()
 
         musicPlayer = MusicPlayer(this)
-        mediaSession = MediaSessionCompat(this,
-            TAG
-        ).apply {
+        mediaSession = MediaSessionCompat(this, TAG).apply {
             setCallback(mediaSessionCallback)
             setSessionToken(sessionToken)
             isActive = true
@@ -47,9 +44,7 @@ class MediaService : MediaBrowserServiceCompat() {
 
     override fun onGetRoot(
         clientPackageName: String, clientUid: Int, rootHints: Bundle?
-    ): BrowserRoot? {
-        return BrowserRoot(MEDIA_ROOT_ID, null)
-    }
+    ): BrowserRoot? = BrowserRoot(MEDIA_ROOT_ID, null)
 
     override fun onLoadChildren(
         parentId: String, result: Result<MutableList<MediaBrowserCompat.MediaItem>>
@@ -74,7 +69,6 @@ class MediaService : MediaBrowserServiceCompat() {
         override fun onSkipToPrevious() {
             musicPlayer.skipToPrevious()
         }
-
 
 
         override fun onPrepare() {

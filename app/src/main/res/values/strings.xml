@@ -4,4 +4,7 @@
     <string name="next_track">Next track: %s</string>
     <string name="playback_channel_name">Now playing</string>
     <string name="channel_description">Current track notification and control</string>
+    <string name="song_title">%s - %s</string>
+    <string name="track_uri">android.resource://%s/%s</string>
+    <string name="track_duration">%d:%d</string>
 </resources>

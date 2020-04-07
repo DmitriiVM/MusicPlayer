@@ -7,7 +7,6 @@ import android.support.v4.media.MediaBrowserCompat
 import android.support.v4.media.MediaMetadataCompat
 import android.support.v4.media.session.MediaControllerCompat
 import android.support.v4.media.session.PlaybackStateCompat
-import android.util.Log
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
@@ -46,8 +45,7 @@ class MediaBrowserViewModel(private val app: Application) : AndroidViewModel(app
         mediaBrowser = MediaBrowserCompat(
             app.applicationContext,
             ComponentName(app.applicationContext, MediaService::class.java),
-            connectionCallback,
-            null
+            connectionCallback, null
         )
         mediaBrowser.connect()
     }
@@ -105,8 +103,5 @@ class MediaBrowserViewModel(private val app: Application) : AndroidViewModel(app
                 _progressLiveData.value = it.toInt()
             }
         }
-
-
-
     }
 }
