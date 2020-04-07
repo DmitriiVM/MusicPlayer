@@ -20,12 +20,16 @@ class MainActivity : AppCompatActivity(), RecyclerViewAdapter.OnTrackClickListen
     private lateinit var adapter : RecyclerViewAdapter
     private var isFirstIcon = true
     private var showAnimation = true
+    private var isFirstLoad = true
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
-        if (savedInstanceState != null) showAnimation = false
+        if (savedInstanceState != null) {
+            showAnimation = false
+            isFirstLoad = savedInstanceState.getBoolean(KEY_FIRST_LOAD)
+        }
 
         adapter = RecyclerViewAdapter(this)
 
@@ -147,6 +151,12 @@ class MainActivity : AppCompatActivity(), RecyclerViewAdapter.OnTrackClickListen
             recyclerView.adapter = adapter
             adapter.setPlayList(it)
         })
+        mediaBrowserViewModel.onMediaControllerConnected.observe(this, Observer {
+            if (isFirstIcon){
+                mediaBrowserViewModel.getTransportControls().prepare()
+                isFirstLoad = false
+            }
+        })
     }
 
     override fun onTrackClick(position: Int) {
@@ -162,6 +172,16 @@ class MainActivity : AppCompatActivity(), RecyclerViewAdapter.OnTrackClickListen
     override fun onStop() {
         super.onStop()
         mediaBrowserViewModel.onStop()
+    }
+
+
+    override fun onSaveInstanceState(outState: Bundle) {
+        super.onSaveInstanceState(outState)
+        outState.putBoolean(KEY_FIRST_LOAD, isFirstLoad)
+    }
+
+    companion object {
+        private const val KEY_FIRST_LOAD = "first_load"
     }
 }
 

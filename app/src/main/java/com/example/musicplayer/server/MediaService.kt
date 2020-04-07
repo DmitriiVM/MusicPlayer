@@ -75,9 +75,24 @@ class MediaService : MediaBrowserServiceCompat() {
             musicPlayer.skipToPrevious()
         }
 
+
+
         override fun onPrepare() {
             musicPlayer.onPrepare()
         }
+
+//        override fun onCustomAction(action: String?, extras: Bundle?) {
+//            Log.d("mmm", "MediaService :  onCustomAction --  $action")
+//            if (action == "is_first_load") {
+//                musicPlayer.onPrepare(true)
+//            } else {
+//                false
+//            }
+//        }
+
+
+
+
 
         override fun onSeekTo(pos: Long) {
             musicPlayer.seekTo(pos)
@@ -88,6 +103,7 @@ class MediaService : MediaBrowserServiceCompat() {
                 musicPlayer.playSelectedTrack(mediaId.toInt())
             }
         }
+
     }
 
     private val playbackInfoListener = object :

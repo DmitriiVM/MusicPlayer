@@ -36,7 +36,7 @@ class MusicPlayer(private val service: MediaBrowserServiceCompat) {
     private var playbackState: PlaybackStateCompat? = null
     var job: Job? = null
     private val context = service.applicationContext
-    private var isFirstLoad = true
+//    private var isFirstLoad = true
 
     fun initializePlayer(
         playList: List<MediaMetadataCompat>,
@@ -109,15 +109,26 @@ class MusicPlayer(private val service: MediaBrowserServiceCompat) {
     }
 
     fun onPrepare() {
-        if (isFirstLoad) {
+//        if (isFirstLoad) {
+        Log.d("mmm", "MusicPlayer :  onPrepare --  ")
             updateMediaMetadata()
             playbackState?.let {
                 playbackInfoListener?.onPlaybackStateChange(it)
             }
             playbackInfoListener?.onProgressChanged(exoPlayer.contentPosition)
-            isFirstLoad = false
-        }
+//            isFirstLoad = false
+//        }
     }
+
+//    fun onPrepare(isFirstLoad : Boolean) {
+//        if (isFirstLoad) {
+//        updateMediaMetadata()
+//        playbackState?.let {
+//            playbackInfoListener?.onPlaybackStateChange(it)
+//        }
+//        playbackInfoListener?.onProgressChanged(exoPlayer.contentPosition)
+//        }
+//    }
 
     fun releasePlayer() {
         exoPlayer.release()

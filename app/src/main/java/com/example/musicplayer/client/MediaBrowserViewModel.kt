@@ -38,6 +38,10 @@ class MediaBrowserViewModel(private val app: Application) : AndroidViewModel(app
     val playListLiveData: LiveData<List<MediaBrowserCompat.MediaItem>>
         get() = _playListLiveData
 
+    private val _onMediaControllerConnected = MutableLiveData<Unit>()
+    val onMediaControllerConnected: LiveData<Unit>
+        get() = _onMediaControllerConnected
+
     fun onStart() {
         mediaBrowser = MediaBrowserCompat(
             app.applicationContext,
@@ -60,7 +64,9 @@ class MediaBrowserViewModel(private val app: Application) : AndroidViewModel(app
                 MediaControllerCompat(app.applicationContext, mediaBrowser.sessionToken)
             mediaController?.registerCallback(mediaControllerCallback)
             mediaBrowser.subscribe(mediaBrowser.root, mediaBrowserSubscriptionCallback)
-            mediaController?.transportControls?.prepare()
+//            mediaController?.transportControls?.prepare()
+//            mediaController?.transportControls?.sendCustomAction("55", null)
+            _onMediaControllerConnected.value = Unit
         }
     }
 
