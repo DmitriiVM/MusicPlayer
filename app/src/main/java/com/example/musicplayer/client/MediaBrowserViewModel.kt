@@ -64,8 +64,6 @@ class MediaBrowserViewModel(private val app: Application) : AndroidViewModel(app
                 MediaControllerCompat(app.applicationContext, mediaBrowser.sessionToken)
             mediaController?.registerCallback(mediaControllerCallback)
             mediaBrowser.subscribe(mediaBrowser.root, mediaBrowserSubscriptionCallback)
-//            mediaController?.transportControls?.prepare()
-//            mediaController?.transportControls?.sendCustomAction("55", null)
             _onMediaControllerConnected.value = Unit
         }
     }
@@ -80,8 +78,9 @@ class MediaBrowserViewModel(private val app: Application) : AndroidViewModel(app
             }
         }
 
-    fun getTransportControls(): MediaControllerCompat.TransportControls =
-        mediaController!!.transportControls
+    fun getTransportControls(): MediaControllerCompat.TransportControls? {
+        return mediaController?.transportControls
+    }
 
     private val mediaControllerCallback = object : MediaControllerCompat.Callback() {
 
@@ -98,7 +97,6 @@ class MediaBrowserViewModel(private val app: Application) : AndroidViewModel(app
         }
 
         override fun onQueueTitleChanged(currentPosition: CharSequence?) {
-//            Log.d("mmm", "MediaBrowserViewModel :  onQueueTitleChanged --  ")
             _currentPositionLiveData.value = currentPosition
         }
 

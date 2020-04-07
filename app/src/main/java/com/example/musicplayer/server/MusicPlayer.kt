@@ -9,7 +9,6 @@ import android.media.session.PlaybackState
 import android.os.SystemClock
 import android.support.v4.media.MediaMetadataCompat
 import android.support.v4.media.session.PlaybackStateCompat
-import android.util.Log
 import androidx.core.content.ContextCompat
 import androidx.media.MediaBrowserServiceCompat
 import com.example.musicplayer.R
@@ -36,7 +35,6 @@ class MusicPlayer(private val service: MediaBrowserServiceCompat) {
     private var playbackState: PlaybackStateCompat? = null
     var job: Job? = null
     private val context = service.applicationContext
-//    private var isFirstLoad = true
 
     fun initializePlayer(
         playList: List<MediaMetadataCompat>,
@@ -109,26 +107,12 @@ class MusicPlayer(private val service: MediaBrowserServiceCompat) {
     }
 
     fun onPrepare() {
-//        if (isFirstLoad) {
-        Log.d("mmm", "MusicPlayer :  onPrepare --  ")
-            updateMediaMetadata()
-            playbackState?.let {
-                playbackInfoListener?.onPlaybackStateChange(it)
-            }
-            playbackInfoListener?.onProgressChanged(exoPlayer.contentPosition)
-//            isFirstLoad = false
-//        }
+        updateMediaMetadata()
+        playbackState?.let {
+            playbackInfoListener?.onPlaybackStateChange(it)
+        }
+        playbackInfoListener?.onProgressChanged(exoPlayer.contentPosition)
     }
-
-//    fun onPrepare(isFirstLoad : Boolean) {
-//        if (isFirstLoad) {
-//        updateMediaMetadata()
-//        playbackState?.let {
-//            playbackInfoListener?.onPlaybackStateChange(it)
-//        }
-//        playbackInfoListener?.onProgressChanged(exoPlayer.contentPosition)
-//        }
-//    }
 
     fun releasePlayer() {
         exoPlayer.release()

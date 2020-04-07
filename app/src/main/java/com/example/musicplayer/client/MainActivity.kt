@@ -38,17 +38,17 @@ class MainActivity : AppCompatActivity(), RecyclerViewAdapter.OnTrackClickListen
         ).get(MediaBrowserViewModel::class.java)
 
         imageViewSkipToNext.setOnClickListener {
-            mediaBrowserViewModel.getTransportControls().skipToNext()
+            mediaBrowserViewModel.getTransportControls()?.skipToNext()
 
 
         }
         imageViewSkipToPrevious.setOnClickListener {
-            mediaBrowserViewModel.getTransportControls().skipToPrevious()
+            mediaBrowserViewModel.getTransportControls()?.skipToPrevious()
         }
         seekBar.setOnSeekBarChangeListener(object : SeekBar.OnSeekBarChangeListener{
             override fun onProgressChanged(seekBar: SeekBar?, progress: Int, fromUser: Boolean) {
                 if (fromUser) {
-                    mediaBrowserViewModel.getTransportControls().seekTo(progress.toLong())
+                    mediaBrowserViewModel.getTransportControls()?.seekTo(progress.toLong())
                 }
             }
 
@@ -127,7 +127,7 @@ class MainActivity : AppCompatActivity(), RecyclerViewAdapter.OnTrackClickListen
                 PlaybackStateCompat.STATE_PLAYING -> {
                     imageViewPlayPause.setImageResource(R.drawable.ic_pause_circle_outline_black_24dp)
                     imageViewPlayPause.setOnClickListener {
-                        mediaBrowserViewModel.getTransportControls().pause()
+                        mediaBrowserViewModel.getTransportControls()?.pause()
                     }
 
                     imageViewPlayPause.rotate()
@@ -137,7 +137,7 @@ class MainActivity : AppCompatActivity(), RecyclerViewAdapter.OnTrackClickListen
                 PlaybackStateCompat.STATE_PAUSED -> {
                     imageViewPlayPause.setImageResource(R.drawable.ic_play_circle_outline_black_24dp)
                     imageViewPlayPause.setOnClickListener {
-                        mediaBrowserViewModel.getTransportControls().play()
+                        mediaBrowserViewModel.getTransportControls()?.play()
                     }
 
                     imageViewPlayPause.rotate()
@@ -153,14 +153,14 @@ class MainActivity : AppCompatActivity(), RecyclerViewAdapter.OnTrackClickListen
         })
         mediaBrowserViewModel.onMediaControllerConnected.observe(this, Observer {
             if (isFirstIcon){
-                mediaBrowserViewModel.getTransportControls().prepare()
+                mediaBrowserViewModel.getTransportControls()?.prepare()
                 isFirstLoad = false
             }
         })
     }
 
     override fun onTrackClick(position: Int) {
-        mediaBrowserViewModel.getTransportControls().playFromMediaId(position.toString(), null)
+        mediaBrowserViewModel.getTransportControls()?.playFromMediaId(position.toString(), null)
 //        adapter.selectItem(position)
     }
 
