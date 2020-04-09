@@ -5,5 +5,5 @@
     <color name="colorAccent">#D81B60</color>
 
     <color name="colorDefault">#217883</color>
-    <color name="colorRipple">#217883</color>
+    <color name="background_color">#E0EFF3</color>
 </resources>
